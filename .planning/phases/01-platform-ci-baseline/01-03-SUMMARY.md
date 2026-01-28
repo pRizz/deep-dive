@@ -52,10 +52,10 @@ completed: 2026-01-28
 
 ## Task Commits
 
-Each task was committed atomically:
+Task commits for this plan:
 
 1. **Task 1: Add CI workflow for UI + Go checks** - `ea120b0` (chore)
-2. **Task 2: Build and validate the extension image in CI** - `592ab93` (chore)
+2. **Task 2: Build and validate the extension image in CI** - `592ab93`, `7c8b22a` (chore)
 
 **Plan metadata:** (this commit)
 
