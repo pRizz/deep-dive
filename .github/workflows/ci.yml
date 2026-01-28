@@ -25,7 +25,7 @@ jobs:
       - name: Install UI dependencies
         working-directory: ui
         run: |
-          npm_config_optional=true npm install --include=optional
+          npm_config_optional=true npm ci --include=optional
 
       - name: Install Rollup Linux binary
         working-directory: ui
