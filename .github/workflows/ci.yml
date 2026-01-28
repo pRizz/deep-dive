@@ -58,52 +58,12 @@ jobs:
         run: |
           set -euo pipefail
           RELEASE_JSON=$(curl -fsSL https://api.github.com/repos/docker/extension-sdk/releases/latest)
-          ASSET_URL=$(python - <<'PY'
-import json
-import os
-import re
-data = json.loads(os.environ["RELEASE_JSON"])
-assets = data.get("assets", [])
-pattern = re.compile(r"linux-amd64$")
-for asset in assets:
-    name = asset.get("name", "")
-    if pattern.search(name):
-        print(asset.get("browser_download_url", ""))
-        break
-PY
-          )
+          ASSET_URL=$(python -c 'import json,os,re; data=json.loads(os.environ["RELEASE_JSON"]); pattern=re.compile(r"linux-amd64$"); print(next((a.get("browser_download_url","") for a in data.get("assets",[]) if pattern.search(a.get("name",""))), ""))')
           if [ -z "$ASSET_URL" ]; then
             echo "Docker Extensions CLI asset not found." >&2
             exit 1
           fi
-          CLI_PATH=$(ASSET_URL="$ASSET_URL" python - <<'PY'
-import os
-import tarfile
-import tempfile
-import urllib.request
-
-url = os.environ["ASSET_URL"]
-tmpdir = tempfile.mkdtemp()
-archive_path = os.path.join(tmpdir, "docker-extension-asset")
-urllib.request.urlretrieve(url, archive_path)
-
-out_path = os.path.join(tmpdir, "docker-extension")
-if url.endswith((".tar.gz", ".tgz")):
-    with tarfile.open(archive_path, "r:gz") as tar:
-        members = [m for m in tar.getmembers() if os.path.basename(m.name) == "docker-extension"]
-        if not members:
-            raise SystemExit("docker-extension binary not found in archive")
-        member = members[0]
-        member.name = os.path.basename(member.name)
-        tar.extract(member, path=tmpdir)
-        out_path = os.path.join(tmpdir, "docker-extension")
-else:
-    os.rename(archive_path, out_path)
-
-os.chmod(out_path, 0o755)
-print(out_path)
-PY
-          )
+          CLI_PATH=$(ASSET_URL="$ASSET_URL" python -c $'import os,tarfile,tempfile,urllib.request\nurl=os.environ["ASSET_URL"]\ntmpdir=tempfile.mkdtemp()\narchive_path=os.path.join(tmpdir,"docker-extension-asset")\nurllib.request.urlretrieve(url, archive_path)\nout_path=os.path.join(tmpdir,"docker-extension")\nif url.endswith((".tar.gz",".tgz")):\n    with tarfile.open(archive_path,"r:gz") as tar:\n        members=[m for m in tar.getmembers() if os.path.basename(m.name)=="docker-extension"]\n        if not members:\n            raise SystemExit("docker-extension binary not found in archive")\n        member=members[0]\n        member.name=os.path.basename(member.name)\n        tar.extract(member, path=tmpdir)\n        out_path=os.path.join(tmpdir,"docker-extension")\nelse:\n    os.rename(archive_path, out_path)\nos.chmod(out_path, 0o755)\nprint(out_path)\n')
           if [ -z "$CLI_PATH" ]; then
             echo "Docker Extensions CLI binary missing after download." >&2
             exit 1
