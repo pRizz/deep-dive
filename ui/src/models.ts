@@ -33,3 +33,29 @@ export interface Image {
   name: string;
   id: string;
 }
+
+export type AnalysisSource = "docker" | "docker-archive";
+
+export type JobStatus = "queued" | "running" | "succeeded" | "failed";
+
+export interface AnalyzeRequest {
+  image?: string;
+  source: AnalysisSource;
+  archivePath?: string;
+}
+
+export interface AnalyzeResponse {
+  jobId: string;
+  status: JobStatus;
+}
+
+export interface AnalysisStatusResponse {
+  jobId: string;
+  status: JobStatus;
+  message?: string;
+}
+
+export interface AnalysisErrorResponse {
+  status?: JobStatus;
+  message: string;
+}

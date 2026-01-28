@@ -14,3 +14,9 @@ export function formatBytes(bytes: number, decimals = 2) {
 export function extractId(id: string) {
   return id.replace("sha256:", "").substring(0, 12);
 }
+
+export function joinUrl(base: string, path: string) {
+  const trimmedBase = base.replace(/\/$/, "");
+  const trimmedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${trimmedBase}${trimmedPath}`;
+}
