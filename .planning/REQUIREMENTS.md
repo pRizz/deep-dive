@@ -84,29 +84,29 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ANAL-01 | TBD | Pending |
-| ANAL-02 | TBD | Pending |
-| LAYR-01 | TBD | Pending |
-| METR-01 | TBD | Pending |
-| UI-01 | TBD | Pending |
-| UI-02 | TBD | Pending |
-| REL-01 | TBD | Pending |
-| REL-02 | TBD | Pending |
-| REL-03 | TBD | Pending |
-| HIST-01 | TBD | Pending |
-| SHARE-01 | TBD | Pending |
-| CI-01 | TBD | Pending |
-| COMP-01 | TBD | Pending |
-| INTEG-01 | TBD | Pending |
-| PLAT-01 | TBD | Pending |
-| PLAT-02 | TBD | Pending |
-| PLAT-03 | TBD | Pending |
-| PLAT-04 | TBD | Pending |
+| ANAL-01 | Phase 2 | Pending |
+| ANAL-02 | Phase 2 | Pending |
+| LAYR-01 | Phase 3 | Pending |
+| METR-01 | Phase 3 | Pending |
+| UI-01 | Phase 3 | Pending |
+| UI-02 | Phase 3 | Pending |
+| REL-01 | Phase 2 | Pending |
+| REL-02 | Phase 2 | Pending |
+| REL-03 | Phase 2 | Pending |
+| HIST-01 | Phase 4 | Pending |
+| SHARE-01 | Phase 4 | Pending |
+| CI-01 | Phase 4 | Pending |
+| COMP-01 | Phase 5 | Pending |
+| INTEG-01 | Phase 5 | Pending |
+| PLAT-01 | Phase 1 | Pending |
+| PLAT-02 | Phase 1 | Pending |
+| PLAT-03 | Phase 1 | Pending |
+| PLAT-04 | Phase 1 | Pending |
 
 **Coverage:**
-- v1 requirements: 17 total
-- Mapped to phases: 0
-- Unmapped: 17 ⚠️
+- v1 requirements: 18 total
+- Mapped to phases: 18
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-01-28*
