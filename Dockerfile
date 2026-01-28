@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go build -trimpath -ldflags="-s -w" -o bin/service
 
-FROM --platform=$BUILDPLATFORM node:18.9-alpine3.15 AS client-builder
+FROM --platform=$BUILDPLATFORM node:20.19-alpine AS client-builder
 WORKDIR /ui
 # cache packages in layer
 COPY ui/package.json /ui/package.json
@@ -40,5 +40,5 @@ COPY docker-compose.yaml .
 COPY metadata.json .
 COPY docker.svg .
 COPY scuba.svg .
-COPY --from=client-builder /ui/build ui
+COPY --from=client-builder /ui/dist ui
 CMD /service -socket /run/guest-services/extension-dive-in.sock
