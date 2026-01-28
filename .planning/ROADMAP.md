@@ -31,10 +31,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Maintainer can run a release workflow that updates versions and tags.
   3. Maintainer can develop the UI with Vite and run lint/tests locally.
   4. Maintainer can run Go tests/vet as part of CI.
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Migrate UI toolchain to Vite
+- [ ] 01-02-PLAN.md — Add lint/test tooling + justfile + Dockerfile updates
+- [ ] 01-03-PLAN.md — Add Linux CI build/test/validate workflow
+- [ ] 01-04-PLAN.md — Add release automation with Changesets + semantic-release
 
 ### Phase 2: Reliable Analysis Runs
 **Goal**: Users can run Dive analyses and always know job status or failure details.
