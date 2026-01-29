@@ -662,8 +662,20 @@ export function App() {
           {isDiveMissing ? (
             <Alert severity="info">
               Install Dive in the backend VM image, rebuild the extension, and
-              reinstall it in Docker Desktop. See the Dive install docs for
-              package options and binaries.
+              reinstall it in Docker Desktop. Basic install options:
+              <Box component="ul" sx={{ pl: 2, mt: 1, mb: 0 }}>
+                <li>macOS (Homebrew): <code>brew install dive</code></li>
+                <li>
+                  Ubuntu/Debian: download the latest <code>.deb</code> and run{" "}
+                  <code>sudo apt install ./dive_&lt;version&gt;_linux_amd64.deb</code>
+                </li>
+                <li>
+                  RHEL/CentOS: download the latest <code>.rpm</code> and run{" "}
+                  <code>rpm -i dive_&lt;version&gt;_linux_amd64.rpm</code>
+                </li>
+              </Box>
+              For more options (Windows, Arch, Nix, Docker), see the Dive install
+              docs.
               <Box sx={{ mt: 1 }}>
                 <Button
                   size="small"
