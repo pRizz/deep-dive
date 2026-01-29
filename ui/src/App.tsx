@@ -4,6 +4,7 @@ import {
   Typography,
   Card,
   CardActions,
+  Chip,
   Divider,
   Stack,
   Grid,
@@ -18,6 +19,8 @@ import {
   LinearProgress,
   Radio,
   RadioGroup,
+  Tab,
+  Tabs,
   TextField,
 } from "@mui/material";
 
@@ -26,7 +29,7 @@ import CompareView from "./compare";
 import CIGateDialog from "./cigatedialog";
 import ExportDialog from "./exportdialog";
 import HistoryList from "./history";
-import { extractId, getErrorMessage } from "./utils";
+import { extractId, formatBytes, formatRelativeTimeFromNow, getErrorMessage } from "./utils";
 import {
   AnalysisResult,
   AnalysisSource,
@@ -51,12 +54,16 @@ interface DockerImage {
   RepoTags: [string];
   Id: string;
   RepoDigests?: string[];
+  Created?: number;
+  CreatedAt?: string;
+  Size?: number;
 }
 
 export function App() {
   const [analysis, setAnalysisResult] = useState<AnalysisResult | undefined>(
     undefined
   );
+  const [activeTab, setActiveTab] = useState<"analysis" | "history">("analysis");
   const [isCheckingDive, setCheckingDive] = useState<boolean>(false);
   const [images, setImages] = useState<Image[]>([]);
   const [isDiveInstalled, setDiveInstalled] = useState<boolean>(false);
@@ -126,13 +133,32 @@ export function App() {
     }
     const all = await readImages();
     const references = new Set<string>();
+    const parseCreatedAt = (image: DockerImage) => {
+      if (typeof image.Created === "number" && Number.isFinite(image.Created)) {
+        return image.Created * 1000;
+      }
+      if (image.CreatedAt) {
+        const parsed = Date.parse(image.CreatedAt);
+        if (Number.isFinite(parsed)) {
+          return parsed;
+        }
+      }
+      return undefined;
+    };
     const images = all.flatMap((i) => {
+      const createdAt = parseCreatedAt(i);
+      const sizeBytes = typeof i.Size === "number" ? i.Size : undefined;
       const result: Image[] = [];
       const tags = i.RepoTags?.filter((tag) => tag !== "<none>:<none>") ?? [];
       tags.forEach((tag) => {
         if (!references.has(tag)) {
           references.add(tag);
-          result.push({ name: tag, id: extractId(i.Id) });
+          result.push({
+            name: tag,
+            id: extractId(i.Id),
+            createdAt,
+            sizeBytes,
+          });
         }
       });
       const digests =
@@ -140,7 +166,12 @@ export function App() {
       digests.forEach((digest) => {
         if (!references.has(digest)) {
           references.add(digest);
-          result.push({ name: digest, id: extractId(i.Id) });
+          result.push({
+            name: digest,
+            id: extractId(i.Id),
+            createdAt,
+            sizeBytes,
+          });
         }
       });
       return result;
@@ -242,6 +273,7 @@ export function App() {
       return;
     }
     try {
+      setActiveTab("analysis");
       const entry = (await ddClient.extension.vm.service.get(
         `/history/${id}`
       )) as HistoryEntry;
@@ -343,6 +375,7 @@ export function App() {
         dive,
       });
       setSelectedHistoryId(currentJobId);
+      setActiveTab("analysis");
       fetchHistory();
     } catch (error) {
       setJobStatus("failed");
@@ -384,47 +417,92 @@ export function App() {
     }
   };
 
+  const imageChipSx = {
+    height: "auto",
+    "& .MuiChip-label": {
+      fontSize: "0.8rem",
+      lineHeight: 1.1,
+      paddingInline: 2,
+      paddingBlock: 1,
+    },
+  };
+
   function ImageCard(props: { image: Image }) {
+    const createdLabel = props.image.createdAt
+      ? new Date(props.image.createdAt).toLocaleString()
+      : undefined;
+    const createdRelative = props.image.createdAt
+      ? formatRelativeTimeFromNow(props.image.createdAt)
+      : undefined;
+    const sizeLabel =
+      typeof props.image.sizeBytes === "number"
+        ? formatBytes(props.image.sizeBytes)
+        : undefined;
+
     return (
       <>
-        <Card sx={{ minWidth: 200 }} variant="outlined">
-          <CardContent>
-            <Typography
-              sx={{ fontSize: 14 }}
-              color="text.secondary"
-              gutterBottom
-            >
-              {props.image.id}
-            </Typography>
-            <Typography variant="body1" component="div">
-              {props.image.name}
-            </Typography>
-          </CardContent>
-          <CardActions>
-            <Box sx={{ position: "relative" }}>
-              <Button
-                variant="outlined"
-                disabled={isJobActive}
-                onClick={() => {
-                  startAnalysis(props.image.name, "docker");
-                }}
+        <Card
+          sx={{ minWidth: 200, height: "100%", display: "flex", flexDirection: "column" }}
+          variant="outlined"
+        >
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{ flex: 1 }}
+          >
+            <CardContent sx={{ flex: 1, minWidth: 0 }}>
+              <Typography
+                variant="subtitle1"
+                component="div"
+                sx={{ fontWeight: 500, overflowWrap: "anywhere" }}
+                gutterBottom
               >
-                Analyze
-                {isJobActive && jobTarget === props.image.name && (
-                  <CircularProgress
-                    size={24}
-                    sx={{
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      marginTop: "-12px",
-                      marginLeft: "-12px",
-                    }}
-                  />
-                )}
-              </Button>
-            </Box>
-          </CardActions>
+                {props.image.name}
+              </Typography>
+              <Typography sx={{ fontSize: 14 }} color="text.secondary">
+                {props.image.id}
+              </Typography>
+              <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 1 }}>
+                {createdLabel ? (
+                  <Chip label={`Built: ${createdLabel}`} size="small" sx={imageChipSx} />
+                ) : null}
+                {createdRelative ? (
+                  <Chip label={`Age: ${createdRelative}`} size="small" sx={imageChipSx} />
+                ) : null}
+                {sizeLabel ? (
+                  <Chip label={`Size: ${sizeLabel}`} size="small" sx={imageChipSx} />
+                ) : null}
+              </Stack>
+            </CardContent>
+            <CardActions
+              sx={{ justifyContent: "flex-end", pr: 2, flexShrink: 0 }}
+            >
+              <Box sx={{ position: "relative" }}>
+                <Button
+                  variant="outlined"
+                  disabled={isJobActive}
+                  onClick={() => {
+                    startAnalysis(props.image.name, "docker");
+                  }}
+                >
+                  Analyze
+                  {isJobActive && jobTarget === props.image.name && (
+                    <CircularProgress
+                      size={24}
+                      sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        marginTop: "-12px",
+                        marginLeft: "-12px",
+                      }}
+                    />
+                  )}
+                </Button>
+              </Box>
+            </CardActions>
+          </Stack>
           {jobTarget === props.image.name && jobStatus ? (
             <CardContent sx={{ pt: 0 }}>
               <Typography variant="caption" color="text.secondary">
@@ -438,20 +516,41 @@ export function App() {
     );
   }
 
-  const ImageList = () => (
-    <>
-      <Typography variant="h3" sx={{ mb: 2 }}>
-        Choose an image below to get started
-      </Typography>
-      <Grid container spacing={2}>
-        {images.map((image, i) => (
-          <Grid item xs key={i}>
-            <ImageCard image={image}></ImageCard>
-          </Grid>
-        ))}
-      </Grid>
-    </>
-  );
+  const ImageList = () => {
+    const [filter, setFilter] = useState("");
+    const filteredImages = useMemo(() => {
+      const trimmed = filter.trim().toLowerCase();
+      if (!trimmed) {
+        return images;
+      }
+      return images.filter((image) =>
+        image.name.toLowerCase().includes(trimmed)
+      );
+    }, [filter, images]);
+
+    return (
+      <>
+        <Typography variant="h3" sx={{ mb: 2 }}>
+          Choose an image below to get started
+        </Typography>
+        <TextField
+          label="Filter by image name"
+          value={filter}
+          onChange={(event) => setFilter(event.target.value)}
+          size="small"
+          sx={{ mb: 2, maxWidth: 360 }}
+          disabled={isJobActive}
+        />
+        <Grid container spacing={2} alignItems="stretch">
+          {filteredImages.map((image) => (
+            <Grid item xs={12} md={6} key={image.id}>
+              <ImageCard image={image}></ImageCard>
+            </Grid>
+          ))}
+        </Grid>
+      </>
+    );
+  };
 
   const ArchiveAnalyzer = () => (
     <Stack spacing={2}>
@@ -586,6 +685,7 @@ export function App() {
     resetJobState();
     setSelectedHistoryId(undefined);
     setCompareIds({ leftId, rightId });
+    setActiveTab("analysis");
   };
 
   const isJobActive = jobStatus === "queued" || jobStatus === "running";
@@ -651,11 +751,18 @@ export function App() {
 
   return (
     <>
-      <Typography variant="h1">Dive-In</Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
-        Use this Docker extension to helps you explore a docker image, layer
-        contents, and discover ways to shrink the size of your Docker/OCI image.
-      </Typography>
+      <Stack
+        direction="row"
+        alignItems="baseline"
+        spacing={2}
+        flexWrap="wrap"
+      >
+        <Typography variant="h1">Dive-In</Typography>
+        <Typography variant="body1" color="text.secondary">
+          Use this Docker extension to helps you explore a docker image, layer
+          contents, and discover ways to shrink the size of your Docker/OCI image.
+        </Typography>
+      </Stack>
       <Divider sx={{ mt: 4, mb: 4 }} orientation="horizontal" flexItem />
       {!ddClient ? null : statusAlert}
       {!ddClient ? null : (
@@ -739,62 +846,85 @@ export function App() {
             Retry check
           </Button>
         </Stack>
-      ) : analysis ? (
-        <Analysis
-          onExit={clearAnalysis}
-          analysis={analysis}
-          onOpenExport={() => setExportDialogOpen(true)}
-          onOpenCIGate={() => setCIGateDialogOpen(true)}
-          historyId={selectedHistoryId}
-        ></Analysis>
-      ) : compareIds ? (
-        <CompareView
-          leftId={compareIds.leftId}
-          rightId={compareIds.rightId}
-          onBack={() => setCompareIds(undefined)}
-          client={ddClient}
-        />
       ) : (
-        <Stack spacing={3}>
-          <FormControl disabled={isJobActive}>
-            <FormLabel id="analysis-source-label">
-              Analysis source
-            </FormLabel>
-            <RadioGroup
-              row
-              aria-labelledby="analysis-source-label"
-              value={source}
-              onChange={(event) =>
-                setSource(event.target.value as AnalysisSource)
-              }
-            >
-              <FormControlLabel
-                value="docker"
-                control={<Radio />}
-                label="Docker engine"
+        <>
+          <Tabs
+            value={activeTab}
+            onChange={(_, value) => setActiveTab(value)}
+            aria-label="Analysis and history tabs"
+            sx={{
+              "& .MuiTab-root": {
+                fontSize: "2rem",
+                fontWeight: 500,
+                textTransform: "none",
+              },
+            }}
+          >
+            <Tab label="Analysis" value="analysis" />
+            <Tab label="History" value="history" />
+          </Tabs>
+          <Box role="tabpanel" hidden={activeTab !== "analysis"} sx={{ mt: 3 }}>
+            {analysis ? (
+              <Analysis
+                onExit={clearAnalysis}
+                analysis={analysis}
+                onOpenExport={() => setExportDialogOpen(true)}
+                onOpenCIGate={() => setCIGateDialogOpen(true)}
+                historyId={selectedHistoryId}
+              ></Analysis>
+            ) : compareIds ? (
+              <CompareView
+                leftId={compareIds.leftId}
+                rightId={compareIds.rightId}
+                onBack={() => setCompareIds(undefined)}
+                client={ddClient}
               />
-              <FormControlLabel
-                value="docker-archive"
-                control={<Radio />}
-                label="Docker archive"
-              />
-            </RadioGroup>
-          </FormControl>
-          {source === "docker" ? <ImageList></ImageList> : <ArchiveAnalyzer />}
-          <HistoryList
-            entries={historyEntries}
-            isLoading={isHistoryLoading}
-            error={historyError}
-            onSelect={openHistoryEntry}
-            onDelete={deleteHistoryEntry}
-            onDeleteAll={deleteAllHistory}
-            compareSelection={compareSelection}
-            onCompareSelect={updateCompareSelection}
-            onCompareClear={clearCompareSelection}
-            onCompare={openCompareView}
-            disabled={isJobActive}
-          />
-        </Stack>
+            ) : (
+              <Stack spacing={3}>
+                <FormControl disabled={isJobActive}>
+                  <FormLabel id="analysis-source-label">
+                    Analysis source
+                  </FormLabel>
+                  <RadioGroup
+                    row
+                    aria-labelledby="analysis-source-label"
+                    value={source}
+                    onChange={(event) =>
+                      setSource(event.target.value as AnalysisSource)
+                    }
+                  >
+                    <FormControlLabel
+                      value="docker"
+                      control={<Radio />}
+                      label="Docker engine"
+                    />
+                    <FormControlLabel
+                      value="docker-archive"
+                      control={<Radio />}
+                      label="Docker archive"
+                    />
+                  </RadioGroup>
+                </FormControl>
+                {source === "docker" ? <ImageList></ImageList> : <ArchiveAnalyzer />}
+              </Stack>
+            )}
+          </Box>
+          <Box role="tabpanel" hidden={activeTab !== "history"} sx={{ mt: 3 }}>
+            <HistoryList
+              entries={historyEntries}
+              isLoading={isHistoryLoading}
+              error={historyError}
+              onSelect={openHistoryEntry}
+              onDelete={deleteHistoryEntry}
+              onDeleteAll={deleteAllHistory}
+              compareSelection={compareSelection}
+              onCompareSelect={updateCompareSelection}
+              onCompareClear={clearCompareSelection}
+              onCompare={openCompareView}
+              disabled={isJobActive}
+            />
+          </Box>
+        </>
       )}
     </>
   );

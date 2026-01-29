@@ -31,6 +31,48 @@ export function formatPercent(value: number, decimals = 1) {
   return `${(value * 100).toFixed(decimals)}%`;
 }
 
+export function formatRelativeTimeFromNow(timestampMs: number) {
+  const nowMs = Date.now();
+  const diffMs = timestampMs - nowMs;
+  const diffSeconds = Math.round(diffMs / 1000);
+  const absSeconds = Math.abs(diffSeconds);
+
+  const units: Array<{ limit: number; unit: Intl.RelativeTimeFormatUnit }> = [
+    { limit: 60, unit: "second" },
+    { limit: 3600, unit: "minute" },
+    { limit: 86400, unit: "hour" },
+    { limit: 2592000, unit: "day" },
+    { limit: 31536000, unit: "month" },
+    { limit: Infinity, unit: "year" },
+  ];
+
+  let value = diffSeconds;
+  let unit: Intl.RelativeTimeFormatUnit = "second";
+
+  for (const entry of units) {
+    if (absSeconds < entry.limit) {
+      unit = entry.unit;
+      if (unit === "minute") {
+        value = Math.round(diffSeconds / 60);
+      } else if (unit === "hour") {
+        value = Math.round(diffSeconds / 3600);
+      } else if (unit === "day") {
+        value = Math.round(diffSeconds / 86400);
+      } else if (unit === "month") {
+        value = Math.round(diffSeconds / 2592000);
+      } else if (unit === "year") {
+        value = Math.round(diffSeconds / 31536000);
+      }
+      break;
+    }
+  }
+
+  return new Intl.RelativeTimeFormat(undefined, { numeric: "auto" }).format(
+    value,
+    unit
+  );
+}
+
 export function calculatePercent(part: number, total: number) {
   if (!Number.isFinite(part) || !Number.isFinite(total) || total <= 0) {
     return 0;
