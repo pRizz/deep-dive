@@ -31,3 +31,6 @@ install-extension:
 
 update-extension:
   docker extension update {{extension_image}}:{{tag}} --force
+
+reinstall-development-extension:
+  docker build -t {{image}} . ; docker extension update {{image}} --force
