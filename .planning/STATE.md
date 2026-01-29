@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** Users can run Dive analysis on their images from Docker Desktop and trust the results they see.
-**Current focus:** Phase 3 - Core Insights UI
+**Current focus:** Phase 5 - Compare + Scout Handoff
 
 ## Current Position
 
-Phase: 3 of 7 (Core Insights UI)
+Phase: 4 of 7 (History + Export + CI Gates)
 Plan: 1 of 1 in current phase
 Status: Phase complete
-Next Phase: Phase 4 - History + Export + CI Gates
-Last activity: 2026-01-29 — Completed 03-01-PLAN.md
+Next Phase: Phase 5 - Compare + Scout Handoff
+Last activity: 2026-01-29 — Completed 04-01-PLAN.md
 
 Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: -
 - Total execution time: -
 
@@ -31,6 +31,7 @@ Progress: [██████████] 100%
 | 1. Platform + CI Baseline | 4 | 4 | - |
 | 2. Reliable Analysis Runs | 1 | 1 | 10m |
 | 3. Core Insights UI | 1 | 1 | 7m |
+| 4. History + Export + CI Gates | 1 | 1 | 11m |
 
 **Recent Trend:**
 - Last 5 plans: -
@@ -46,6 +47,8 @@ Recent decisions affecting current work:
 - Use an in-memory job store for Phase 2 job lifecycle tracking.
 - Use Docker Desktop extension service API for backend requests.
 - Use MUI List/Collapse for the file tree to avoid new dependencies.
+- Persist history in `/data/history` using per-run entry files and exports.
+- Generate exports and CI rules from stored Dive JSON results.
 
 ### Pending Todos
 
@@ -62,6 +65,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-29 03:58 UTC
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-01-29 04:55 UTC
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
