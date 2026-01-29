@@ -23,6 +23,11 @@ COPY ui /ui
 RUN npm run build
 
 FROM alpine
+ARG DIVE_VERSION=0.13.1
+RUN apk add --no-cache ca-certificates curl tar \
+    && curl -fsSL "https://github.com/wagoodman/dive/releases/download/v${DIVE_VERSION}/dive_${DIVE_VERSION}_linux_amd64.tar.gz" \
+      | tar -xz -C /usr/local/bin dive \
+    && chmod +x /usr/local/bin/dive
 LABEL org.opencontainers.image.title="Dive In" \
     org.opencontainers.image.description="Explore docker images, layer contents, and discover ways to shrink the size of your Docker/OCI image." \
     org.opencontainers.image.vendor="Prakhar Srivastav" \
