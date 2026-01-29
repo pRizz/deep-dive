@@ -1,6 +1,12 @@
 export interface DiveResponse {
   layer: DiveLayer[];
   image: DiveImageStats;
+  fileTree?: unknown;
+  filetree?: unknown;
+  tree?: unknown;
+  fileSystem?: unknown;
+  files?: unknown;
+  root?: unknown;
 }
 
 export interface DiveImageStats {
@@ -16,12 +22,56 @@ export interface FileReference {
   file: string;
 }
 
+export type FileChangeType =
+  | "added"
+  | "modified"
+  | "removed"
+  | "unchanged"
+  | "unknown";
+
+export type FileNodeType = "file" | "directory" | "link" | "unknown";
+
+export interface FileTreeNode {
+  name: string;
+  path: string;
+  sizeBytes?: number;
+  fileType?: FileNodeType;
+  change?: FileChangeType;
+  children?: FileTreeNode[];
+}
+
+export interface LayerFileTree {
+  layerId?: string;
+  layerIndex?: number;
+  command?: string;
+  tree: FileTreeNode[];
+}
+
+export interface NormalizedFileTree {
+  aggregate: FileTreeNode[];
+  layers: LayerFileTree[];
+}
+
+export interface LayerChangeEntry {
+  path: string;
+  change: FileChangeType;
+  sizeBytes?: number;
+}
+
 export interface DiveLayer {
   index: number;
   id: string;
   digestId: string;
   sizeBytes: number;
   command: string;
+  fileTree?: unknown;
+  filetree?: unknown;
+  tree?: unknown;
+  diffTree?: unknown;
+  changes?: unknown;
+  fileSystem?: unknown;
+  files?: unknown;
+  root?: unknown;
 }
 
 export interface AnalysisResult {
