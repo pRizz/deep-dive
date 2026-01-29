@@ -17,9 +17,11 @@ Go through [the official docs](https://docs.docker.com/desktop/extensions-sdk/qu
 
 ### Local development
 
-1. Install UI dependencies: `cd ui && npm install`
-2. Run the UI dev server: `npm run dev`
-3. Build the extension image from the repo root: `docker build -t dive-in:dev .`
+Prereqs: Docker Desktop (extensions enabled), Node.js 20+, Go (per `vm/go.mod`).
+
+1. Install UI dependencies: `npm --prefix ui install`
+2. Build the UI: `npm --prefix ui run build`
+3. Build the extension image: `docker build -t dive-in:dev .`
 4. Load the local extension into Docker Desktop: `docker extension install dive-in:dev`
 
 To update a local install, rebuild and re-run the install command.

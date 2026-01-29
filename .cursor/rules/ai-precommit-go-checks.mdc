@@ -1,0 +1,16 @@
+---
+description: Run Go checks before committing backend changes
+globs: vm/**
+alwaysApply: false
+---
+
+# Pre-commit Go Checks (AI Agents)
+
+Before committing changes under `vm/`, run:
+
+```bash
+go test ./...
+go vet ./...
+```
+
+Run these from the `vm/` directory (module root). If either fails, fix the issues before committing.

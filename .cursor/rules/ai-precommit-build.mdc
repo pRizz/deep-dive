@@ -1,0 +1,15 @@
+---
+description: Run UI build before committing UI changes
+globs: ui/**
+alwaysApply: false
+---
+
+# Pre-commit Build Check (AI Agents)
+
+Before committing changes in this repo, run the UI build and ensure it succeeds:
+
+```bash
+npm --prefix ui run build
+```
+
+If the build fails, fix the issues before committing.
