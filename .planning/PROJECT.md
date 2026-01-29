@@ -28,6 +28,8 @@ Users can run Dive analysis on their images from Docker Desktop and trust the re
 - [x] Replace Makefile with a justfile (dev/build/test/package/ci targets)
 - [x] Update README to reflect new tooling, workflow, and requirements
 - [x] Establish basic UI and Go test hooks in CI (even if minimal initially)
+- [x] Core insights UI for layers and metrics (Phase 3)
+- [x] History, export, and CI gate actions (Phase 4)
 
 ### Out of Scope
 
@@ -62,4 +64,4 @@ Users can run Dive analysis on their images from Docker Desktop and trust the re
 | Keep backend in single file | Scope is small and refactor not required | Confirmed |
 
 ---
-*Last updated: 2026-01-29 after Phase 2 completion*
+*Last updated: 2026-01-29 after Phase 4 completion*

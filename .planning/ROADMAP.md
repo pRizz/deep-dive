@@ -14,8 +14,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Platform + CI Baseline** - Modern toolchain, CI, and release foundations
 - [x] **Phase 2: Reliable Analysis Runs** - Run analyses with status and actionable errors
-- [ ] **Phase 3: Core Insights UI** - Layer exploration, metrics, and native UI polish
-- [ ] **Phase 4: History + Export + CI Gates** - Persist results and enable sharing/thresholds
+- [x] **Phase 3: Core Insights UI** - Layer exploration, metrics, and native UI polish
+- [x] **Phase 4: History + Export + CI Gates** - Persist results and enable sharing/thresholds
 - [ ] **Phase 5: Compare + Scout Handoff** - Advanced comparisons and integrations
 - [ ] **Phase 6: on long running tasks, ensure they are asynchronous so the UI is not blocked and try to show a better progress indicator if we can show status of progress, for example when clicking "Analyze" on a docker image.** - [To be planned]
 - [ ] **Phase 7: add simple instructions to the readme for allowing for local development of this and instructions for loading the local extension in Docker Desktop** - [To be planned]
@@ -65,7 +65,7 @@ Plans:
 **Plans**: 1
 
 Plans:
-- [ ] 03-01-PLAN.md — Add core insights UI for layers and metrics
+- [x] 03-01-PLAN.md — Add core insights UI for layers and metrics
 
 ### Phase 4: History + Export + CI Gates
 **Goal**: Users can retain analyses and share or gate results.
@@ -78,7 +78,7 @@ Plans:
 **Plans**: 1
 
 Plans:
-- [ ] 04-01-PLAN.md — Add history, export, and CI gate actions
+- [x] 04-01-PLAN.md — Add history, export, and CI gate actions
 
 ### Phase 5: Compare + Scout Handoff
 **Goal**: Users can compare images and hand off to Docker Scout when available.
@@ -87,10 +87,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User can compare two images/tags and see metric and layer deltas.
   2. User can hand off to Docker Scout when available.
-**Plans**: TBD
+**Plans**: 1
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md — Add compare workflows and Scout handoff
 
 ### Phase 6: on long running tasks, ensure they are asynchronous so the UI is not blocked and try to show a better progress indicator if we can show status of progress, for example when clicking "Analyze" on a docker image.
 
@@ -125,8 +125,8 @@ Phases execute in numeric order: 2 → 2.1 → 2.2 → 3 → 3.1 → 4
 |-------|----------------|--------|-----------|
 | 1. Platform + CI Baseline | 4/4 | Complete | 2026-01-29 |
 | 2. Reliable Analysis Runs | 1/1 | Complete | 2026-01-29 |
-| 3. Core Insights UI | 0/TBD | Not started | - |
-| 4. History + Export + CI Gates | 0/TBD | Not started | - |
+| 3. Core Insights UI | 1/1 | Complete | 2026-01-29 |
+| 4. History + Export + CI Gates | 1/1 | Complete | 2026-01-29 |
 | 5. Compare + Scout Handoff | 0/TBD | Not started | - |
 | 6. on long running tasks, ensure they are asynchronous so the UI is not blocked and try to show a better progress indicator if we can show status of progress, for example when clicking "Analyze" on a docker image. | 0/TBD | Not started | - |
 | 7. add simple instructions to the readme for allowing for local development of this and instructions for loading the local extension in Docker Desktop | 0/TBD | Not started | - |
