@@ -44,8 +44,6 @@ export function joinUrl(base: string, path: string) {
   return `${trimmedBase}${trimmedPath}`;
 }
 
-type Primitive = string | number | boolean | null | undefined;
-
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -70,7 +68,7 @@ function readFirstValue(
   return undefined;
 }
 
-function toNumber(value: Primitive): number | undefined {
+function toNumber(value: unknown): number | undefined {
   if (typeof value === "number" && Number.isFinite(value)) {
     return value;
   }
@@ -83,7 +81,7 @@ function toNumber(value: Primitive): number | undefined {
   return undefined;
 }
 
-function toStringValue(value: Primitive): string | undefined {
+function toStringValue(value: unknown): string | undefined {
   if (typeof value === "string") {
     return value;
   }
@@ -93,7 +91,7 @@ function toStringValue(value: Primitive): string | undefined {
   return undefined;
 }
 
-function toBoolean(value: Primitive): boolean | undefined {
+function toBoolean(value: unknown): boolean | undefined {
   if (typeof value === "boolean") {
     return value;
   }
@@ -266,7 +264,7 @@ export function normalizeDiveFileTrees(dive: DiveResponse): NormalizedFileTree {
   );
 
   const layers = (dive.layer ?? []).map((layer) => {
-    const layerRecord = layer as Record<string, unknown>;
+    const layerRecord = layer as unknown as Record<string, unknown>;
     const layerCandidates = [
       layerRecord.fileTree,
       layerRecord.filetree,
