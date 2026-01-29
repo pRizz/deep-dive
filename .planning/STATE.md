@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 ## Current Position
 
 Phase: 5 of 7 (Compare + Scout Handoff)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Next Phase: Phase 5 - Compare + Scout Handoff
-Last activity: 2026-01-29 — Transitioned to Phase 5 planning
+Plan: 1 of 1 in current phase
+Status: Phase complete
+Next Phase: Phase 6 - Long running task progress UX
+Last activity: 2026-01-29 — Completed 05-01-PLAN.md
 
-Progress: [███████░░░] 57%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: -
 - Total execution time: -
 
@@ -32,7 +32,7 @@ Progress: [███████░░░] 57%
 | 2. Reliable Analysis Runs | 1 | 1 | 10m |
 | 3. Core Insights UI | 1 | 1 | 7m |
 | 4. History + Export + CI Gates | 1 | 1 | 11m |
-| 5. Compare + Scout Handoff | 0 | TBD | - |
+| 5. Compare + Scout Handoff | 1 | 1 | 5m |
 
 **Recent Trend:**
 - Last 5 plans: -
@@ -50,6 +50,7 @@ Recent decisions affecting current work:
 - Use MUI List/Collapse for the file tree to avoid new dependencies.
 - Persist history in `/data/history` using per-run entry files and exports.
 - Generate exports and CI rules from stored Dive JSON results.
+- Compare runs in the UI by fetching two history entries and matching layers by digest/id.
 
 ### Pending Todos
 
@@ -66,6 +67,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-29 05:10 UTC
-Stopped at: Transitioned to Phase 5 planning
+Last session: 2026-01-29 17:45 UTC
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
