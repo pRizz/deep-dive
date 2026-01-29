@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"net"
@@ -15,11 +16,14 @@ import (
 	"sync"
 	"time"
 
+	"dive-in/history"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 )
 
 const analysisTimeout = 5 * time.Minute
+const historyDir = "/data/history"
+const historyMaxEntries = 50
 
 type JobStatus string
 
@@ -31,10 +35,14 @@ const (
 )
 
 type Job struct {
-	ID      string
-	Status  JobStatus
-	Message string
-	Result  json.RawMessage
+	ID          string
+	Status      JobStatus
+	Message     string
+	Result      json.RawMessage
+	Source      string
+	Target      string
+	CreatedAt   time.Time
+	CompletedAt time.Time
 }
 
 type JobStore struct {
@@ -48,8 +56,9 @@ func NewJobStore() *JobStore {
 
 func (s *JobStore) Create() *Job {
 	job := &Job{
-		ID:     newJobID(),
-		Status: StatusQueued,
+		ID:        newJobID(),
+		Status:    StatusQueued,
+		CreatedAt: time.Now(),
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -98,6 +107,7 @@ type AnalysisErrorResponse struct {
 }
 
 var jobStore = NewJobStore()
+var historyStore = history.NewStore(historyDir, historyMaxEntries)
 
 func main() {
 	var socketPath string
@@ -122,6 +132,9 @@ func main() {
 	router.POST("/analyze", analyzeImage)
 	router.GET("/analysis/:id/status", getAnalysisStatus)
 	router.GET("/analysis/:id/result", getAnalysisResult)
+	router.GET("/history", listHistory)
+	router.GET("/history/:id", getHistoryEntry)
+	router.DELETE("/history/:id", deleteHistoryEntry)
 
 	if err := router.Start(startURL); err != nil {
 		logrus.WithError(err).Fatal("Server stopped")
@@ -149,6 +162,10 @@ func analyzeImage(c echo.Context) error {
 	}
 
 	job := jobStore.Create()
+	jobStore.Update(job.ID, func(job *Job) {
+		job.Source = req.Source
+		job.Target = target
+	})
 	go runAnalyzeJob(job.ID, req, target)
 
 	return c.JSON(http.StatusAccepted, AnalyzeResponse{
@@ -222,11 +239,26 @@ func runAnalyzeJob(jobID string, req AnalyzeRequest, target string) {
 		return
 	}
 
+	completedAt := time.Now()
 	jobStore.Update(jobID, func(job *Job) {
 		job.Status = StatusSucceeded
 		job.Message = ""
 		job.Result = result
+		job.CompletedAt = completedAt
 	})
+
+	job, ok := jobStore.Get(jobID)
+	if !ok {
+		return
+	}
+	entry, err := history.NewEntry(job.ID, job.Target, job.Source, job.CreatedAt, job.CompletedAt, job.Result)
+	if err != nil {
+		logrus.WithError(err).Warn("Failed to build history entry")
+		return
+	}
+	if err := historyStore.Save(entry); err != nil {
+		logrus.WithError(err).Warn("Failed to persist history entry")
+	}
 }
 
 func runDive(source string, target string) (json.RawMessage, error) {
@@ -291,6 +323,40 @@ func resolveAnalyzeTarget(req AnalyzeRequest) (string, error) {
 
 func jsonError(c echo.Context, status int, message string) error {
 	return c.JSON(status, AnalysisErrorResponse{Message: message})
+}
+
+func listHistory(c echo.Context) error {
+	entries, err := historyStore.List()
+	if err != nil {
+		return jsonError(c, http.StatusInternalServerError, "Failed to load history")
+	}
+	return c.JSON(http.StatusOK, entries)
+}
+
+func getHistoryEntry(c echo.Context) error {
+	id := c.Param("id")
+	entry, err := historyStore.Get(id)
+	if err != nil {
+		if errors.Is(err, history.ErrNotFound) {
+			return jsonError(c, http.StatusNotFound, "History entry not found")
+		}
+		return jsonError(c, http.StatusInternalServerError, "Failed to load history entry")
+	}
+	return c.JSON(http.StatusOK, entry)
+}
+
+func deleteHistoryEntry(c echo.Context) error {
+	id := c.Param("id")
+	if _, err := historyStore.Get(id); err != nil {
+		if errors.Is(err, history.ErrNotFound) {
+			return jsonError(c, http.StatusNotFound, "History entry not found")
+		}
+		return jsonError(c, http.StatusInternalServerError, "Failed to load history entry")
+	}
+	if err := historyStore.Delete(id); err != nil {
+		return jsonError(c, http.StatusInternalServerError, "Failed to delete history entry")
+	}
+	return c.NoContent(http.StatusNoContent)
 }
 
 func newJobID() string {
