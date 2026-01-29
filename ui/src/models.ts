@@ -82,6 +82,7 @@ export interface AnalysisResult {
 export interface Image {
   name: string;
   id: string;
+  fullId?: string;
   createdAt?: number;
   sizeBytes?: number;
 }
@@ -92,6 +93,7 @@ export type JobStatus = "queued" | "running" | "succeeded" | "failed";
 
 export interface AnalyzeRequest {
   image?: string;
+  imageId?: string;
   source: AnalysisSource;
   archivePath?: string;
 }
@@ -121,6 +123,7 @@ export interface HistorySummary {
 export interface HistoryMetadata {
   id: string;
   image: string;
+  imageId?: string;
   source: AnalysisSource;
   createdAt: string;
   completedAt: string;

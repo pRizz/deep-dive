@@ -15,6 +15,7 @@ type Summary struct {
 type Metadata struct {
 	ID          string    `json:"id"`
 	Image       string    `json:"image"`
+	ImageID     string    `json:"imageId,omitempty"`
 	Source      string    `json:"source"`
 	CreatedAt   time.Time `json:"createdAt"`
 	CompletedAt time.Time `json:"completedAt"`
@@ -34,7 +35,7 @@ type diveSummaryPayload struct {
 	} `json:"image"`
 }
 
-func NewEntry(id string, image string, source string, startedAt time.Time, completedAt time.Time, result json.RawMessage) (Entry, error) {
+func NewEntry(id string, image string, imageID string, source string, startedAt time.Time, completedAt time.Time, result json.RawMessage) (Entry, error) {
 	if len(result) == 0 {
 		return Entry{}, fmt.Errorf("analysis result is empty")
 	}
@@ -47,6 +48,7 @@ func NewEntry(id string, image string, source string, startedAt time.Time, compl
 	metadata := Metadata{
 		ID:          id,
 		Image:       image,
+		ImageID:     imageID,
 		Source:      source,
 		CreatedAt:   startedAt,
 		CompletedAt: completedAt,

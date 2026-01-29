@@ -89,6 +89,7 @@ func (s *JobStore) Update(id string, update func(job *Job)) bool {
 
 type AnalyzeRequest struct {
 	Image       string `json:"image"`
+	ImageID     string `json:"imageId,omitempty"`
 	Source      string `json:"source"`
 	ArchivePath string `json:"archivePath,omitempty"`
 }
@@ -268,7 +269,15 @@ func runAnalyzeJob(jobID string, req AnalyzeRequest, target string) {
 	if !ok {
 		return
 	}
-	entry, err := history.NewEntry(job.ID, job.Target, job.Source, job.CreatedAt, job.CompletedAt, job.Result)
+	entry, err := history.NewEntry(
+		job.ID,
+		job.Target,
+		req.ImageID,
+		job.Source,
+		job.CreatedAt,
+		job.CompletedAt,
+		job.Result,
+	)
 	if err != nil {
 		logrus.WithError(err).Warn("Failed to build history entry")
 		return

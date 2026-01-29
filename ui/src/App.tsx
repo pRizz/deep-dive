@@ -159,6 +159,7 @@ export function App() {
           result.push({
             name: tag,
             id: extractId(i.Id),
+            fullId: i.Id,
             createdAt,
             sizeBytes,
           });
@@ -172,6 +173,7 @@ export function App() {
           result.push({
             name: digest,
             id: extractId(i.Id),
+            fullId: i.Id,
             createdAt,
             sizeBytes,
           });
@@ -388,7 +390,8 @@ export function App() {
 
   const startAnalysis = async (
     target: string,
-    selectedSource: AnalysisSource
+    selectedSource: AnalysisSource,
+    maybeImageId?: string
   ) => {
     if (!ddClient?.extension?.vm?.service) {
       setJobStatus("failed");
@@ -399,7 +402,11 @@ export function App() {
     const payload: AnalyzeRequest =
       selectedSource === "docker-archive"
         ? { source: selectedSource, archivePath: target }
-        : { source: selectedSource, image: target };
+        : {
+            source: selectedSource,
+            image: target,
+            imageId: maybeImageId,
+          };
 
     setJobMessage(undefined);
     setAnalysisResult(undefined);
@@ -430,7 +437,7 @@ export function App() {
     },
   };
 
-  function ImageCard(props: { image: Image }) {
+  function ImageCard(props: { image: Image; historyEntry?: HistoryMetadata }) {
     const createdLabel = props.image.createdAt
       ? new Date(props.image.createdAt).toLocaleString()
       : undefined;
@@ -481,29 +488,40 @@ export function App() {
             <CardActions
               sx={{ justifyContent: "flex-end", pr: 2, flexShrink: 0 }}
             >
-              <Box sx={{ position: "relative" }}>
-                <Button
-                  variant="outlined"
-                  disabled={isJobActive}
+              <Stack direction="row" spacing={1} alignItems="center">
+                {props.historyEntry ? (
+                  <Button
+                    variant="outlined"
+                    disabled={isJobActive}
+                    onClick={() => openHistoryEntry(props.historyEntry?.id ?? "")}
+                  >
+                    View analysis
+                  </Button>
+                ) : null}
+                <Box sx={{ position: "relative" }}>
+                  <Button
+                    variant="outlined"
+                    disabled={isJobActive}
                   onClick={() => {
-                    startAnalysis(props.image.name, "docker");
+                    startAnalysis(props.image.name, "docker", props.image.fullId);
                   }}
-                >
-                  Analyze
-                  {isJobActive && jobTarget === props.image.name && (
-                    <CircularProgress
-                      size={24}
-                      sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        marginTop: "-12px",
-                        marginLeft: "-12px",
-                      }}
-                    />
-                  )}
-                </Button>
-              </Box>
+                  >
+                    {props.historyEntry ? "Re-analyze" : "Analyze"}
+                    {isJobActive && jobTarget === props.image.name && (
+                      <CircularProgress
+                        size={24}
+                        sx={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          marginTop: "-12px",
+                          marginLeft: "-12px",
+                        }}
+                      />
+                    )}
+                  </Button>
+                </Box>
+              </Stack>
             </CardActions>
           </Stack>
           {jobTarget === props.image.name && jobStatus ? (
@@ -523,6 +541,26 @@ export function App() {
     const [filter, setFilter] = useState("");
     const [sortBy, setSortBy] = useState<"name" | "created" | "size">("created");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+    const historyByImageRef = useMemo(() => {
+      const map = new Map<string, HistoryMetadata>();
+      historyEntries.forEach((entry) => {
+        if (entry.source !== "docker") {
+          return;
+        }
+        const key = entry.imageId || entry.image;
+        const existing = map.get(key);
+        if (!existing) {
+          map.set(key, entry);
+          return;
+        }
+        const existingTime = Date.parse(existing.completedAt);
+        const nextTime = Date.parse(entry.completedAt);
+        if (Number.isFinite(nextTime) && nextTime > existingTime) {
+          map.set(key, entry);
+        }
+      });
+      return map;
+    }, [historyEntries]);
     const filteredImages = useMemo(() => {
       const trimmed = filter.trim().toLowerCase();
       if (!trimmed) {
@@ -620,11 +658,19 @@ export function App() {
           </Alert>
         ) : (
           <Grid container spacing={2} alignItems="stretch">
-            {sortedImages.map((image) => (
+          {sortedImages.map((image) => {
+            const historyEntry = image.fullId
+              ? historyByImageRef.get(image.fullId)
+              : undefined;
+            return (
               <Grid item xs={12} md={6} key={`${image.id}-${image.name}`}>
-                <ImageCard image={image}></ImageCard>
+                <ImageCard
+                  image={image}
+                  historyEntry={historyEntry}
+                ></ImageCard>
               </Grid>
-            ))}
+            );
+          })}
           </Grid>
         )}
       </>
