@@ -29,8 +29,9 @@ To update a local install, rebuild and re-run the install command.
 Useful commands for setting up debugging
 
 ```
-$ docker extension dev debug prakhar1989/dive-in
-$ docker extension dev ui-source prakhar1989/dive-in http://localhost:3000
+$ npm --prefix ui run dev
+$ docker extension dev debug dive-in:dev
+$ docker extension dev ui-source dive-in:dev http://localhost:5173
 ```
 
 Make sure you run `npm run dev` in the `ui/` folder.
