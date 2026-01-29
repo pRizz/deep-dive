@@ -23,6 +23,9 @@ import FileTree from "./filetree";
 export default function Analysis(props: {
   analysis: AnalysisResult;
   onExit: () => any;
+  onOpenExport: () => void;
+  onOpenCIGate: () => void;
+  historyId?: string;
 }) {
   const { image, dive } = props.analysis;
   const fileTreeData = useMemo(() => normalizeDiveFileTrees(dive), [dive]);
@@ -33,9 +36,29 @@ export default function Analysis(props: {
   return (
     <>
       <Stack direction="column" spacing={4} alignItems="baseline">
-        <Button sx={{ maxWidth: 180 }} variant="outlined" onClick={props.onExit}>
-          Back to images
-        </Button>
+        <Stack direction="row" spacing={2} flexWrap="wrap">
+          <Button
+            sx={{ maxWidth: 180 }}
+            variant="outlined"
+            onClick={props.onExit}
+          >
+            Back to images
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={props.onOpenExport}
+            disabled={!props.historyId}
+          >
+            Export
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={props.onOpenCIGate}
+            disabled={!props.historyId}
+          >
+            CI Gate
+          </Button>
+        </Stack>
         <Typography variant="h3">Analyzing: {image.name}</Typography>
         <Stack spacing={1}>
           <Typography variant="body2" color="text.secondary">

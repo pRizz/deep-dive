@@ -109,3 +109,46 @@ export interface AnalysisErrorResponse {
   status?: JobStatus;
   message: string;
 }
+
+export interface HistorySummary {
+  sizeBytes: number;
+  inefficientBytes: number;
+  efficiencyScore: number;
+}
+
+export interface HistoryMetadata {
+  id: string;
+  image: string;
+  source: AnalysisSource;
+  createdAt: string;
+  completedAt: string;
+  summary: HistorySummary;
+}
+
+export interface HistoryEntry {
+  metadata: HistoryMetadata;
+  result: DiveResponse;
+}
+
+export type ExportFormat = "json" | "csv" | "html";
+
+export interface ExportRequest {
+  format: ExportFormat;
+}
+
+export interface ExportResponse {
+  format: ExportFormat;
+  filename: string;
+  contentType: string;
+}
+
+export interface CIRulesRequest {
+  lowestEfficiency?: number;
+  highestWastedBytes?: string;
+  highestUserWastedPercent?: number;
+}
+
+export interface CIRulesResponse {
+  filename: string;
+  content: string;
+}

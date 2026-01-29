@@ -22,6 +22,9 @@ import {
 } from "@mui/material";
 
 import Analysis from "./analysis";
+import CIGateDialog from "./cigatedialog";
+import ExportDialog from "./exportdialog";
+import HistoryList from "./history";
 import { extractId } from "./utils";
 import {
   AnalysisResult,
@@ -30,7 +33,13 @@ import {
   AnalyzeResponse,
   AnalysisStatusResponse,
   DiveResponse,
+  ExportFormat,
+  ExportResponse,
+  HistoryEntry,
+  HistoryMetadata,
   Image,
+  CIRulesRequest,
+  CIRulesResponse,
   JobStatus,
 } from "./models";
 
@@ -60,6 +69,16 @@ export function App() {
   const [jobStatus, setJobStatus] = useState<JobStatus | undefined>(undefined);
   const [jobMessage, setJobMessage] = useState<string | undefined>(undefined);
   const [jobTarget, setJobTarget] = useState<string | undefined>(undefined);
+  const [historyEntries, setHistoryEntries] = useState<HistoryMetadata[]>([]);
+  const [historyError, setHistoryError] = useState<string | undefined>(
+    undefined
+  );
+  const [isHistoryLoading, setHistoryLoading] = useState(false);
+  const [selectedHistoryId, setSelectedHistoryId] = useState<
+    string | undefined
+  >(undefined);
+  const [isExportDialogOpen, setExportDialogOpen] = useState(false);
+  const [isCIGateDialogOpen, setCIGateDialogOpen] = useState(false);
 
   const ddClient = useMemo(() => {
     try {
@@ -122,11 +141,112 @@ export function App() {
     setImages(images);
   };
 
+  const fetchHistory = async () => {
+    if (!ddClient?.extension?.vm?.service) {
+      return;
+    }
+    setHistoryLoading(true);
+    try {
+      const data = (await ddClient.extension.vm.service.get(
+        "/history"
+      )) as HistoryMetadata[];
+      setHistoryEntries(data);
+      setHistoryError(undefined);
+    } catch (error) {
+      setHistoryError(getErrorMessage(error));
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const openHistoryEntry = async (id: string) => {
+    if (!ddClient?.extension?.vm?.service) {
+      setHistoryError("Backend API is unavailable.");
+      return;
+    }
+    try {
+      const entry = (await ddClient.extension.vm.service.get(
+        `/history/${id}`
+      )) as HistoryEntry;
+      setAnalysisResult({
+        image: {
+          name: entry.metadata.image,
+          id: entry.metadata.id,
+        },
+        dive: entry.result,
+      });
+      setSelectedHistoryId(entry.metadata.id);
+      resetJobState();
+    } catch (error) {
+      setHistoryError(getErrorMessage(error));
+    }
+  };
+
   const resetJobState = () => {
     setJobId(undefined);
     setJobStatus(undefined);
     setJobMessage(undefined);
     setJobTarget(undefined);
+  };
+
+  const downloadFile = (data: BlobPart, filename: string, contentType: string) => {
+    const blob = new Blob([data], { type: contentType });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const normalizeExportData = (data: unknown): BlobPart => {
+    if (typeof data === "string") {
+      return data;
+    }
+    if (data instanceof Uint8Array) {
+      return data;
+    }
+    if (data instanceof ArrayBuffer) {
+      return new Uint8Array(data);
+    }
+    return JSON.stringify(data, null, 2);
+  };
+
+  const handleExport = async (format: ExportFormat) => {
+    if (!ddClient?.extension?.vm?.service) {
+      throw new Error("Backend API is unavailable.");
+    }
+    if (!selectedHistoryId) {
+      throw new Error("Select an analysis entry to export.");
+    }
+    const response = (await ddClient.extension.vm.service.post(
+      `/history/${selectedHistoryId}/export`,
+      { format }
+    )) as ExportResponse;
+    const exported = await ddClient.extension.vm.service.get(
+      `/history/${selectedHistoryId}/export/${format}`
+    );
+    downloadFile(
+      normalizeExportData(exported),
+      response.filename,
+      response.contentType
+    );
+  };
+
+  const handleGenerateCIRules = async (
+    payload: CIRulesRequest
+  ): Promise<CIRulesResponse> => {
+    if (!ddClient?.extension?.vm?.service) {
+      throw new Error("Backend API is unavailable.");
+    }
+    return (await ddClient.extension.vm.service.post(
+      "/ci/rules",
+      payload
+    )) as CIRulesResponse;
+  };
+
+  const handleDownloadCIRules = (content: string, filename: string) => {
+    downloadFile(content, filename, "application/x-yaml");
   };
 
   const fetchAnalysisResult = async (currentJobId: string) => {
@@ -144,6 +264,8 @@ export function App() {
         },
         dive,
       });
+      setSelectedHistoryId(currentJobId);
+      fetchHistory();
     } catch (error) {
       setJobStatus("failed");
       setJobMessage(getErrorMessage(error));
@@ -167,6 +289,7 @@ export function App() {
 
     setJobMessage(undefined);
     setAnalysisResult(undefined);
+    setSelectedHistoryId(undefined);
     setJobTarget(target);
     setJobStatus("queued");
 
@@ -304,6 +427,7 @@ export function App() {
     }
     checkDiveInstallation();
     getImages();
+    fetchHistory();
   }, [ddClient]);
 
   useEffect(() => {
@@ -351,6 +475,7 @@ export function App() {
   const clearAnalysis = () => {
     setAnalysisResult(undefined);
     resetJobState();
+    setSelectedHistoryId(undefined);
   };
 
   const isJobActive = jobStatus === "queued" || jobStatus === "running";
@@ -375,11 +500,13 @@ export function App() {
   const handleRetry = () => {
     resetJobState();
     setAnalysisResult(undefined);
+    setSelectedHistoryId(undefined);
   };
 
   const handleCancel = () => {
     resetJobState();
     setAnalysisResult(undefined);
+    setSelectedHistoryId(undefined);
   };
 
   const statusAlert = jobStatus ? (
@@ -421,6 +548,21 @@ export function App() {
       </Typography>
       <Divider sx={{ mt: 4, mb: 4 }} orientation="horizontal" flexItem />
       {!ddClient ? null : statusAlert}
+      {!ddClient ? null : (
+        <>
+          <ExportDialog
+            open={isExportDialogOpen}
+            onClose={() => setExportDialogOpen(false)}
+            onExport={handleExport}
+          />
+          <CIGateDialog
+            open={isCIGateDialogOpen}
+            onClose={() => setCIGateDialogOpen(false)}
+            onGenerate={handleGenerateCIRules}
+            onDownload={handleDownloadCIRules}
+          />
+        </>
+      )}
       {!ddClient ? (
         <Stack spacing={2}>
           <Alert severity="error">
@@ -456,7 +598,13 @@ export function App() {
           </Button>
         </Stack>
       ) : analysis ? (
-        <Analysis onExit={clearAnalysis} analysis={analysis}></Analysis>
+        <Analysis
+          onExit={clearAnalysis}
+          analysis={analysis}
+          onOpenExport={() => setExportDialogOpen(true)}
+          onOpenCIGate={() => setCIGateDialogOpen(true)}
+          historyId={selectedHistoryId}
+        ></Analysis>
       ) : (
         <Stack spacing={3}>
           <FormControl disabled={isJobActive}>
@@ -484,6 +632,13 @@ export function App() {
             </RadioGroup>
           </FormControl>
           {source === "docker" ? <ImageList></ImageList> : <ArchiveAnalyzer />}
+          <HistoryList
+            entries={historyEntries}
+            isLoading={isHistoryLoading}
+            error={historyError}
+            onSelect={openHistoryEntry}
+            disabled={isJobActive}
+          />
         </Stack>
       )}
     </>
