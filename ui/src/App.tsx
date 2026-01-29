@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 
 import Analysis from "./analysis";
+import CompareView from "./compare";
 import CIGateDialog from "./cigatedialog";
 import ExportDialog from "./exportdialog";
 import HistoryList from "./history";
@@ -40,6 +41,8 @@ import {
   Image,
   CIRulesRequest,
   CIRulesResponse,
+  CompareSelectionState,
+  CompareSide,
   JobStatus,
 } from "./models";
 
@@ -76,6 +79,11 @@ export function App() {
   const [isHistoryLoading, setHistoryLoading] = useState(false);
   const [selectedHistoryId, setSelectedHistoryId] = useState<
     string | undefined
+  >(undefined);
+  const [compareSelection, setCompareSelection] =
+    useState<CompareSelectionState>({});
+  const [compareIds, setCompareIds] = useState<
+    { leftId: string; rightId: string } | undefined
   >(undefined);
   const [isExportDialogOpen, setExportDialogOpen] = useState(false);
   const [isCIGateDialogOpen, setCIGateDialogOpen] = useState(false);
@@ -168,6 +176,7 @@ export function App() {
       const entry = (await ddClient.extension.vm.service.get(
         `/history/${id}`
       )) as HistoryEntry;
+      setCompareIds(undefined);
       setAnalysisResult({
         image: {
           name: entry.metadata.image,
@@ -478,6 +487,38 @@ export function App() {
     setSelectedHistoryId(undefined);
   };
 
+  const updateCompareSelection = (side: CompareSide, id: string) => {
+    setCompareSelection((prev) => {
+      const next = { ...prev };
+      if (side === "left") {
+        next.leftId = id;
+        if (prev.rightId === id) {
+          next.rightId = undefined;
+        }
+      } else {
+        next.rightId = id;
+        if (prev.leftId === id) {
+          next.leftId = undefined;
+        }
+      }
+      return next;
+    });
+  };
+
+  const clearCompareSelection = (side: CompareSide) => {
+    setCompareSelection((prev) => ({
+      ...prev,
+      [side === "left" ? "leftId" : "rightId"]: undefined,
+    }));
+  };
+
+  const openCompareView = (leftId: string, rightId: string) => {
+    setAnalysisResult(undefined);
+    resetJobState();
+    setSelectedHistoryId(undefined);
+    setCompareIds({ leftId, rightId });
+  };
+
   const isJobActive = jobStatus === "queued" || jobStatus === "running";
 
   const errorHint = (() => {
@@ -605,6 +646,13 @@ export function App() {
           onOpenCIGate={() => setCIGateDialogOpen(true)}
           historyId={selectedHistoryId}
         ></Analysis>
+      ) : compareIds ? (
+        <CompareView
+          leftId={compareIds.leftId}
+          rightId={compareIds.rightId}
+          onBack={() => setCompareIds(undefined)}
+          client={ddClient}
+        />
       ) : (
         <Stack spacing={3}>
           <FormControl disabled={isJobActive}>
@@ -637,6 +685,10 @@ export function App() {
             isLoading={isHistoryLoading}
             error={historyError}
             onSelect={openHistoryEntry}
+            compareSelection={compareSelection}
+            onCompareSelect={updateCompareSelection}
+            onCompareClear={clearCompareSelection}
+            onCompare={openCompareView}
             disabled={isJobActive}
           />
         </Stack>

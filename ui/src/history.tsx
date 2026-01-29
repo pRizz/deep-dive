@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { HistoryMetadata } from "./models";
+import { CompareSelectionState, CompareSide, HistoryMetadata } from "./models";
 import { formatBytes, formatPercent } from "./utils";
 
 export default function HistoryList(props: {
@@ -18,9 +18,23 @@ export default function HistoryList(props: {
   isLoading: boolean;
   error?: string;
   onSelect: (id: string) => void;
+  compareSelection?: CompareSelectionState;
+  onCompareSelect?: (side: CompareSide, id: string) => void;
+  onCompareClear?: (side: CompareSide) => void;
+  onCompare?: (leftId: string, rightId: string) => void;
   disabled?: boolean;
 }) {
-  const { entries, isLoading, error, onSelect, disabled } = props;
+  const {
+    entries,
+    isLoading,
+    error,
+    onSelect,
+    compareSelection,
+    onCompareSelect,
+    onCompareClear,
+    onCompare,
+    disabled,
+  } = props;
   const [filter, setFilter] = useState("");
 
   const filteredEntries = useMemo(() => {
@@ -33,10 +47,38 @@ export default function HistoryList(props: {
     );
   }, [entries, filter]);
 
+  const compareReady = Boolean(
+    compareSelection?.leftId && compareSelection?.rightId
+  );
+
+  const selectionHint = (() => {
+    if (!compareSelection?.leftId && !compareSelection?.rightId) {
+      return "Select a baseline and a target to compare.";
+    }
+    if (compareSelection?.leftId && !compareSelection?.rightId) {
+      return "Select a target image to compare against the baseline.";
+    }
+    if (!compareSelection?.leftId && compareSelection?.rightId) {
+      return "Select a baseline image to compare against the target.";
+    }
+    return undefined;
+  })();
+
   return (
     <Stack spacing={2}>
-      <Stack direction="row" alignItems="center" spacing={2}>
+      <Stack direction="row" alignItems="center" spacing={2} flexWrap="wrap">
         <Typography variant="h3">History</Typography>
+        <Button
+          variant="contained"
+          onClick={() =>
+            compareSelection?.leftId &&
+            compareSelection?.rightId &&
+            onCompare?.(compareSelection.leftId, compareSelection.rightId)
+          }
+          disabled={disabled || !compareReady}
+        >
+          Compare
+        </Button>
         <TextField
           label="Filter by image/tag"
           value={filter}
@@ -46,6 +88,11 @@ export default function HistoryList(props: {
           disabled={disabled}
         />
       </Stack>
+      {selectionHint ? (
+        <Typography variant="body2" color="text.secondary">
+          {selectionHint}
+        </Typography>
+      ) : null}
       {error ? <Alert severity="warning">{error}</Alert> : null}
       {isLoading ? (
         <Typography variant="body2" color="text.secondary">
@@ -60,6 +107,8 @@ export default function HistoryList(props: {
           {filteredEntries.map((entry) => {
             const completedAt = new Date(entry.completedAt).toLocaleString();
             const efficiency = formatPercent(entry.summary.efficiencyScore);
+            const isBaseline = compareSelection?.leftId === entry.id;
+            const isTarget = compareSelection?.rightId === entry.id;
             return (
               <Card key={entry.id} variant="outlined">
                 <CardContent>
@@ -68,6 +117,16 @@ export default function HistoryList(props: {
                     <Typography variant="body2" color="text.secondary">
                       Completed: {completedAt}
                     </Typography>
+                    {isBaseline || isTarget ? (
+                      <Stack direction="row" spacing={1} flexWrap="wrap">
+                        {isBaseline ? (
+                          <Chip label="Baseline" size="small" color="primary" />
+                        ) : null}
+                        {isTarget ? (
+                          <Chip label="Target" size="small" color="secondary" />
+                        ) : null}
+                      </Stack>
+                    ) : null}
                     <Stack direction="row" spacing={1} flexWrap="wrap">
                       <Chip
                         label={`Size: ${formatBytes(entry.summary.sizeBytes)}`}
@@ -92,6 +151,30 @@ export default function HistoryList(props: {
                     disabled={disabled}
                   >
                     Open analysis
+                  </Button>
+                  <Button
+                    size="small"
+                    variant={isBaseline ? "contained" : "outlined"}
+                    onClick={() =>
+                      isBaseline
+                        ? onCompareClear?.("left")
+                        : onCompareSelect?.("left", entry.id)
+                    }
+                    disabled={disabled}
+                  >
+                    {isBaseline ? "Baseline" : "Set baseline"}
+                  </Button>
+                  <Button
+                    size="small"
+                    variant={isTarget ? "contained" : "outlined"}
+                    onClick={() =>
+                      isTarget
+                        ? onCompareClear?.("right")
+                        : onCompareSelect?.("right", entry.id)
+                    }
+                    disabled={disabled}
+                  >
+                    {isTarget ? "Target" : "Set target"}
                   </Button>
                 </CardActions>
               </Card>
