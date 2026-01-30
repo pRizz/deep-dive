@@ -1,5 +1,12 @@
 # Deep Dive
 
+[![CI](https://github.com/pRizz/deep-dive/actions/workflows/ci.yml/badge.svg)](https://github.com/pRizz/deep-dive/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/pRizz/deep-dive?display_name=tag)](https://github.com/pRizz/deep-dive/releases)
+[![Docker Image](https://img.shields.io/docker/v/prizz/deep-dive?sort=semver&label=prizz%2Fdeep-dive)](https://hub.docker.com/r/prizz/deep-dive)
+[![Docker Pulls](https://img.shields.io/docker/pulls/prizz/deep-dive)](https://hub.docker.com/r/prizz/deep-dive)
+[![Docker Image Size](https://img.shields.io/docker/image-size/prizz/deep-dive/latest)](https://hub.docker.com/r/prizz/deep-dive)
+[![License](https://img.shields.io/github/license/pRizz/deep-dive)](https://github.com/pRizz/deep-dive/blob/main/LICENSE)
+
 A Docker extension that helps you explore a docker image, layer contents, and discover ways to shrink the size of your Docker/OCI image.
 
 Quick install:
