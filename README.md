@@ -2,6 +2,11 @@
 
 A Docker extension that helps you explore a docker image, layer contents, and discover ways to shrink the size of your Docker/OCI image.
 
+Quick install:
+```
+docker extension install prizz/deep-dive:latest
+```
+
 Built on the top of excellent CLI tool - https://github.com/wagoodman/dive
 
 Based on the original extension by Prakhar Srivastav:
