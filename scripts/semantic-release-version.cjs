@@ -25,7 +25,7 @@ const setNextReleaseVersion = async (context) => {
   context.nextRelease = {
     ...(context.nextRelease ?? {}),
     version: uiVersion,
-    gitTag: `v${uiVersion}`,
+    gitTag: uiVersion,
   };
 
   return uiVersion;
