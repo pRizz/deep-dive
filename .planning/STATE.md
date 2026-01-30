@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-01-28)
 
 **Core value:** Users can run Dive analysis on their images from Docker Desktop and trust the results they see.
-**Current focus:** Phase 5 - Compare + Scout Handoff
+**Current focus:** Phase 6 - Long running task progress UX
 
 ## Current Position
 
-Phase: 5 of 7 (Compare + Scout Handoff)
+Phase: 6 of 7 (Long running task progress UX)
 Plan: 1 of 1 in current phase
 Status: Phase complete
-Next Phase: Phase 6 - Long running task progress UX
-Last activity: 2026-01-29 — Completed 05-01-PLAN.md
+Next Phase: Phase 7 - Local development instructions
+Last activity: 2026-01-30 — Completed 06-01-PLAN.md
 
 Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: -
 - Total execution time: -
 
@@ -33,6 +33,7 @@ Progress: [██████████] 100%
 | 3. Core Insights UI | 1 | 1 | 7m |
 | 4. History + Export + CI Gates | 1 | 1 | 11m |
 | 5. Compare + Scout Handoff | 1 | 1 | 5m |
+| 6. Long running task progress UX | 1 | 1 | 8m |
 
 **Recent Trend:**
 - Last 5 plans: -
@@ -51,6 +52,8 @@ Recent decisions affecting current work:
 - Persist history in `/data/history` using per-run entry files and exports.
 - Generate exports and CI rules from stored Dive JSON results.
 - Compare runs in the UI by fetching two history entries and matching layers by digest/id.
+- Parse progress messages from both stderr and stdout streams for comprehensive coverage of Dive output.
+- Use string matching for common progress patterns to handle Dive output format variations.
 
 ### Pending Todos
 
@@ -67,6 +70,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-29 17:45 UTC
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-01-30 03:16 UTC
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
