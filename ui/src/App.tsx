@@ -882,7 +882,19 @@ export function App() {
         spacing={2}
         flexWrap="wrap"
       >
-        <Typography variant="h1">Deep Dive</Typography>
+        <Typography
+          variant="h1"
+          sx={{ display: "flex", alignItems: "center", gap: 2 }}
+        >
+          <Box
+            component="img"
+            src="scuba.svg"
+            alt="Deep Dive"
+            aria-hidden="true"
+            sx={{ height: 48, width: 48 }}
+          />
+          Deep Dive
+        </Typography>
         <Typography variant="body1" color="text.secondary">
           Use this Docker extension to helps you explore a docker image, layer
           contents, and discover ways to shrink the size of your Docker/OCI image.
