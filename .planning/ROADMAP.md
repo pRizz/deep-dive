@@ -16,9 +16,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Reliable Analysis Runs** - Run analyses with status and actionable errors
 - [x] **Phase 3: Core Insights UI** - Layer exploration, metrics, and native UI polish
 - [x] **Phase 4: History + Export + CI Gates** - Persist results and enable sharing/thresholds
-- [ ] **Phase 5: Compare + Scout Handoff** - Advanced comparisons and integrations
-- [ ] **Phase 6: on long running tasks, ensure they are asynchronous so the UI is not blocked and try to show a better progress indicator if we can show status of progress, for example when clicking "Analyze" on a docker image.** - [To be planned]
-- [ ] **Phase 7: add simple instructions to the readme for allowing for local development of this and instructions for loading the local extension in Docker Desktop** - [To be planned]
+- [x] **Phase 5: Compare + Scout Handoff** - Advanced comparisons and integrations
+- [x] **Phase 6: Long running task progress UX** - Better progress messaging for analysis runs
+- [x] **Phase 7: Local development instructions** - Document local dev and Docker Desktop loading
 
 ## Phase Details
 
@@ -90,31 +90,31 @@ Plans:
 **Plans**: 1
 
 Plans:
-- [ ] 05-01-PLAN.md — Add compare workflows and Scout handoff
+ - [x] 05-01-PLAN.md — Add compare workflows and Scout handoff
 
-### Phase 6: on long running tasks, ensure they are asynchronous so the UI is not blocked and try to show a better progress indicator if we can show status of progress, for example when clicking "Analyze" on a docker image.
+### Phase 6: Long running task progress UX
 
 **Goal:** Users see detailed progress messages during long-running analysis tasks instead of generic "running" status.
 **Depends on:** Phase 5
 **Plans:** 1 plan
 
 Plans:
-- [ ] 06-01-PLAN.md — Capture Dive CLI progress output and enhance UI progress indicators
+- [x] 06-01-PLAN.md — Capture Dive CLI progress output and enhance UI progress indicators
 
 **Details:**
-[To be added during planning]
+- Capture and surface Dive CLI progress messages in job status.
+- Show progress messages prominently in the UI during analysis.
 
-### Phase 7: add simple instructions to the readme for allowing for local development of this and instructions for loading the local extension in Docker Desktop
+### Phase 7: Local development instructions
 
 **Goal:** Developers can follow clear README instructions to set up local development and load the extension in Docker Desktop using just commands.
 **Depends on:** Phase 6
 **Plans:** 1 plan
 
 Plans:
-- [ ] 07-01-PLAN.md — Update README.md with improved local development instructions using just commands
+- [x] 07-01-PLAN.md — Update README.md with improved local development instructions using just commands
 
 **Details:**
-Documentation-only phase that improves README.md with:
 - Prerequisite version requirements (Docker Desktop 4.10.0+, Node.js 20+, Go 1.19+)
 - Fast dev loop workflow (just ui-dev + docker extension dev ui-source)
 - Installation and update commands using just
@@ -131,6 +131,6 @@ Phases execute in numeric order: 2 → 2.1 → 2.2 → 3 → 3.1 → 4
 | 2. Reliable Analysis Runs | 1/1 | Complete | 2026-01-29 |
 | 3. Core Insights UI | 1/1 | Complete | 2026-01-29 |
 | 4. History + Export + CI Gates | 1/1 | Complete | 2026-01-29 |
-| 5. Compare + Scout Handoff | 0/TBD | Not started | - |
-| 6. on long running tasks, ensure they are asynchronous so the UI is not blocked and try to show a better progress indicator if we can show status of progress, for example when clicking "Analyze" on a docker image. | 0/1 | Not started | - |
-| 7. add simple instructions to the readme for allowing for local development of this and instructions for loading the local extension in Docker Desktop | 0/TBD | Not started | - |
+| 5. Compare + Scout Handoff | 1/1 | Complete | 2026-01-29 |
+| 6. Long running task progress UX | 1/1 | Complete | 2026-01-30 |
+| 7. Local development instructions | 1/1 | Complete | 2026-01-30 |
