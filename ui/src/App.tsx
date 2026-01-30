@@ -878,7 +878,7 @@ export function App() {
     <>
       <Stack
         direction="row"
-        alignItems="baseline"
+        alignItems="center"
         spacing={2}
         flexWrap="wrap"
       >
