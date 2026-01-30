@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-tag_pattern="^v[0-9]+\.[0-9]+\.[0-9]+$"
+tag_pattern="^[0-9]+\.[0-9]+\.[0-9]+$"
+
+echo "Finding latest tag..."
 
 latest_tag="$(
   git tag --list |
