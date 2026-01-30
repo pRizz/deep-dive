@@ -29,6 +29,8 @@ Make sure your Docker desktop supports extensions. This extension can be install
 from [Docker Hub](https://hub.docker.com/extensions/prizz/deep-dive) or in
 Docker Desktop.
 
+Publishing guide: see `PUBLISHING.md`.
+
 ## Development
 
 Go through [the official docs](https://docs.docker.com/desktop/extensions-sdk/quickstart/) to understand the basic setting up of the Docker extension.
