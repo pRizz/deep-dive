@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-01-28)
 Phase: 7 of 7 (Local development instructions)
 Plan: 1 of 1 in current phase
 Status: Phase complete
-Next Phase: All phases complete
+Next Phase: Phase 8 - Let's dedupe the main container/image list by hash and when listing them in the cards, show a list of the images and their aliases; example: I have two items in my list that are effectively the same image: (ghcr.io/prizz/opencode-cloud-sandbox:latest 6ddff4b0bb1a) and (ghcr.io/prizz/opencode-cloud-sandbox@sha256:6ddff4b0bb1a971ef21b92bb162197b0e82a60f38f3b6e74d7a0fe995aa06c65 6ddff4b0bb1a)
 Last activity: 2026-01-29 — Documented file tree debug notes
 
 Progress: [██████████] 100%
@@ -70,6 +70,7 @@ None yet.
 
 - Phase 6 added: on long running tasks, ensure they are asynchronous so the UI is not blocked and try to show a better progress indicator if we can show status of progress, for example when clicking "Analyze" on a docker image.
 - Phase 7 added: add simple instructions to the readme for allowing for local development of this and instructions for loading the local extension in Docker Desktop
+- Phase 8 added: let's dedupe the main container/image list by hash and when listing them in the cards, show a list of the images and their aliases; example: I have two items in my list that are effectively the same image: (ghcr.io/prizz/opencode-cloud-sandbox:latest 6ddff4b0bb1a) and (ghcr.io/prizz/opencode-cloud-sandbox@sha256:6ddff4b0bb1a971ef21b92bb162197b0e82a60f38f3b6e74d7a0fe995aa06c65 6ddff4b0bb1a)
 
 ## Session Continuity
 

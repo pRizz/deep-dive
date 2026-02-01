@@ -19,6 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Compare + Scout Handoff** - Advanced comparisons and integrations
 - [x] **Phase 6: Long running task progress UX** - Better progress messaging for analysis runs
 - [x] **Phase 7: Local development instructions** - Document local dev and Docker Desktop loading
+- [ ] **Phase 8: Let's dedupe the main container/image list by hash and when listing them in the cards, show a list of the images and their aliases; example: I have two items in my list that are effectively the same image: (ghcr.io/prizz/opencode-cloud-sandbox:latest 6ddff4b0bb1a) and (ghcr.io/prizz/opencode-cloud-sandbox@sha256:6ddff4b0bb1a971ef21b92bb162197b0e82a60f38f3b6e74d7a0fe995aa06c65 6ddff4b0bb1a)** - Dedupe image cards by hash and show aliases
 
 ## Phase Details
 
@@ -120,6 +121,18 @@ Plans:
 - Installation and update commands using just
 - Troubleshooting guidance
 
+### Phase 8: Let's dedupe the main container/image list by hash and when listing them in the cards, show a list of the images and their aliases; example: I have two items in my list that are effectively the same image: (ghcr.io/prizz/opencode-cloud-sandbox:latest 6ddff4b0bb1a) and (ghcr.io/prizz/opencode-cloud-sandbox@sha256:6ddff4b0bb1a971ef21b92bb162197b0e82a60f38f3b6e74d7a0fe995aa06c65 6ddff4b0bb1a)
+
+**Goal:** [To be planned]
+**Depends on:** Phase 7
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 8 to break down)
+
+**Details:**
+[To be added during planning]
+
 ## Progress
 
 **Execution Order:**
@@ -134,3 +147,4 @@ Phases execute in numeric order: 2 → 2.1 → 2.2 → 3 → 3.1 → 4
 | 5. Compare + Scout Handoff | 1/1 | Complete | 2026-01-29 |
 | 6. Long running task progress UX | 1/1 | Complete | 2026-01-30 |
 | 7. Local development instructions | 1/1 | Complete | 2026-01-30 |
+| 8. Let's dedupe the main container/image list by hash and when listing them in the cards, show a list of the images and their aliases; example: I have two items in my list that are effectively the same image: (ghcr.io/prizz/opencode-cloud-sandbox:latest 6ddff4b0bb1a) and (ghcr.io/prizz/opencode-cloud-sandbox@sha256:6ddff4b0bb1a971ef21b92bb162197b0e82a60f38f3b6e74d7a0fe995aa06c65 6ddff4b0bb1a) | 0/0 | Not started | - |

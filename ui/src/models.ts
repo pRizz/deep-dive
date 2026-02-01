@@ -86,6 +86,7 @@ export interface Image {
   fullId?: string;
   createdAt?: number;
   sizeBytes?: number;
+  aliases: string[];
 }
 
 export type AnalysisSource = "docker" | "docker-archive";

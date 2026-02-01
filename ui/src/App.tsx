@@ -116,6 +116,7 @@ function ImageCard(props: ImageCardProps) {
     typeof props.image.sizeBytes === "number"
       ? formatBytes(props.image.sizeBytes)
       : undefined;
+  const aliases = props.image.aliases.filter((alias) => alias !== props.image.name);
   const elapsedLabel = formatElapsed(props.jobElapsedSeconds);
   const statusLabel = elapsedLabel
     ? `Status: ${props.jobStatus} (${elapsedLabel})`
@@ -145,6 +146,15 @@ function ImageCard(props: ImageCardProps) {
             <Typography sx={{ fontSize: 14 }} color="text.secondary">
               {props.image.id}
             </Typography>
+            {aliases.length > 0 ? (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", overflowWrap: "anywhere" }}
+              >
+                Aliases: {aliases.join(", ")}
+              </Typography>
+            ) : null}
             <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 1 }}>
               {createdLabel ? (
                 <Chip label={`Built: ${createdLabel}`} size="small" sx={imageChipSx} />
@@ -264,9 +274,14 @@ function ImageList(props: ImageListProps) {
     if (!trimmed) {
       return props.images;
     }
-    return props.images.filter((image) =>
-      image.name.toLowerCase().includes(trimmed)
-    );
+    return props.images.filter((image) => {
+      if (image.name.toLowerCase().includes(trimmed)) {
+        return true;
+      }
+      return image.aliases.some((alias) =>
+        alias.toLowerCase().includes(trimmed)
+      );
+    });
   }, [filter, props.images]);
   const sortedImages = useMemo(() => {
     const copy = [...filteredImages];
@@ -456,7 +471,7 @@ export function App() {
       return;
     }
     const all = await readImages();
-    const references = new Set<string>();
+    const byImageId = new Map<string, Image>();
     const parseCreatedAt = (image: DockerImage) => {
       if (typeof image.Created === "number" && Number.isFinite(image.Created)) {
         return image.Created * 1000;
@@ -469,40 +484,38 @@ export function App() {
       }
       return undefined;
     };
-    const images = all.flatMap((i) => {
+    all.forEach((i) => {
       const createdAt = parseCreatedAt(i);
       const sizeBytes = typeof i.Size === "number" ? i.Size : undefined;
-      const result: Image[] = [];
       const tags = i.RepoTags?.filter((tag) => tag !== "<none>:<none>") ?? [];
-      tags.forEach((tag) => {
-        if (!references.has(tag)) {
-          references.add(tag);
-          result.push({
-            name: tag,
-            id: extractId(i.Id),
-            fullId: i.Id,
-            createdAt,
-            sizeBytes,
-          });
-        }
-      });
       const digests =
         i.RepoDigests?.filter((digest) => digest !== "<none>@<none>") ?? [];
-      digests.forEach((digest) => {
-        if (!references.has(digest)) {
-          references.add(digest);
-          result.push({
-            name: digest,
-            id: extractId(i.Id),
-            fullId: i.Id,
-            createdAt,
-            sizeBytes,
-          });
-        }
-      });
-      return result;
+      const aliases = [...tags, ...digests];
+      if (aliases.length === 0) {
+        return;
+      }
+      const existing = byImageId.get(i.Id);
+      const nextAliases = new Set([...(existing?.aliases ?? []), ...aliases]);
+      const preferTag =
+        tags.length > 0 &&
+        (!existing ||
+          existing.name.startsWith("sha256:") ||
+          existing.name.includes("@sha256:"));
+      const primaryName =
+        preferTag && tags.length > 0
+          ? tags[0]
+          : existing?.name ?? aliases[0] ?? extractId(i.Id);
+      const nextImage: Image = {
+        name: primaryName,
+        id: extractId(i.Id),
+        fullId: i.Id,
+        createdAt: existing?.createdAt ?? createdAt,
+        sizeBytes: existing?.sizeBytes ?? sizeBytes,
+        aliases: Array.from(nextAliases),
+      };
+      byImageId.set(i.Id, nextImage);
     });
-    setImages(images);
+    setImages(Array.from(byImageId.values()));
   }, [ddClient, readImages]);
 
   const fetchHistory = useCallback(async () => {
@@ -608,6 +621,7 @@ export function App() {
         image: {
           name: entry.metadata.image,
           id: entry.metadata.id,
+          aliases: [],
         },
         dive: entry.result,
       });
@@ -698,6 +712,7 @@ export function App() {
         image: {
           name: jobTarget ?? "Unknown image",
           id: currentJobId,
+          aliases: [],
         },
         dive,
       });
