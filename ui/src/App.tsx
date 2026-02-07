@@ -32,7 +32,13 @@ import CompareView from "./compare";
 import CIGateDialog from "./cigatedialog";
 import ExportDialog from "./exportdialog";
 import HistoryList from "./history";
-import { GITHUB_URL, LINKEDIN_URL, MEDIUM_URL, TWITTER_URL } from "./constants";
+import {
+  GITHUB_URL,
+  LINKEDIN_URL,
+  MEDIUM_URL,
+  README_BADGES,
+  TWITTER_URL,
+} from "./constants";
 import { extractId, formatBytes, formatRelativeTimeFromNow, getErrorMessage } from "./utils";
 import {
   AnalysisResult,
@@ -1271,6 +1277,31 @@ export function App() {
           </Link>
           .
         </Typography>
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent="center"
+          flexWrap="wrap"
+          useFlexGap
+          sx={{ px: 1 }}
+        >
+          {README_BADGES.map((badge) => (
+            <Link
+              key={badge.label}
+              href={badge.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{ lineHeight: 0 }}
+            >
+              <Box
+                component="img"
+                src={badge.imageUrl}
+                alt={badge.label}
+                sx={{ display: "block", height: 20, width: "auto" }}
+              />
+            </Link>
+          ))}
+        </Stack>
         <Stack direction="row" spacing={2} justifyContent="center">
           <Link href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
             GitHub
