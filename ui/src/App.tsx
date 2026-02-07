@@ -961,6 +961,7 @@ export function App() {
   };
 
   const isJobActive = jobStatus === "queued" || jobStatus === "running";
+  const tabsEnabled = !!ddClient && isDiveInstalled && !isCheckingDive;
 
   const errorHint = (() => {
     if (!jobMessage) {
@@ -1017,13 +1018,30 @@ export function App() {
     <>
       <Stack
         direction="row"
-        alignItems="center"
+        alignItems="flex-start"
+        justifyContent="space-between"
         spacing={2}
         flexWrap="wrap"
+        sx={{ rowGap: 1 }}
       >
+        <Tabs
+          value={activeTab}
+          onChange={(_, value) => setActiveTab(value)}
+          aria-label="Analysis and history tabs"
+          sx={{
+            "& .MuiTab-root": {
+              fontSize: "2rem",
+              fontWeight: 500,
+              textTransform: "none",
+            },
+          }}
+        >
+          <Tab label="Analysis" value="analysis" disabled={!tabsEnabled} />
+          <Tab label="History" value="history" disabled={!tabsEnabled} />
+        </Tabs>
         <Typography
           variant="h1"
-          sx={{ display: "flex", alignItems: "center", gap: 2 }}
+          sx={{ display: "flex", alignItems: "center", gap: 2, ml: "auto" }}
         >
           <Box
             component="img"
@@ -1124,21 +1142,6 @@ export function App() {
         </Stack>
       ) : (
         <>
-          <Tabs
-            value={activeTab}
-            onChange={(_, value) => setActiveTab(value)}
-            aria-label="Analysis and history tabs"
-            sx={{
-              "& .MuiTab-root": {
-                fontSize: "2rem",
-                fontWeight: 500,
-                textTransform: "none",
-              },
-            }}
-          >
-            <Tab label="Analysis" value="analysis" />
-            <Tab label="History" value="history" />
-          </Tabs>
           <Box role="tabpanel" hidden={activeTab !== "analysis"} sx={{ mt: 3 }}>
             {analysis ? (
               <Stack spacing={2}>
