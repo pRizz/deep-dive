@@ -1267,11 +1267,17 @@ export function App() {
           >
             pRizz/dive
           </Link>
-          , a fork of the excellent{" "}
+          <Typography
+            component="span"
+            aria-hidden="true"
+            sx={{ mx: 0.75, fontSize: "1rem", color: "text.disabled" }}
+          >
+            ·
+          </Typography>
           <Link href="https://github.com/wagoodman/dive" target="_blank" rel="noopener noreferrer">
             wagoodman/dive
           </Link>
-          {" "}CLI tool.
+          {" "}(upstream).
         </Typography>
         <Typography variant="caption" color="text.secondary">
           Made by{" "}

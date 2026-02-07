@@ -254,26 +254,36 @@ export default function Analysis(props: {
           <Typography variant="body2" color="text.secondary">
             Helpful links
           </Typography>
-          <Stack direction="row" spacing={2} flexWrap="wrap">
-            <Typography variant="body2" color="text.secondary">
-              Dive docs:{" "}
-              <Link
-                href="https://github.com/pRizz/dive"
-                target="_blank"
-                rel="noreferrer"
-              >
-                pRizz/dive
-              </Link>
+          <Typography variant="body2" color="text.secondary">
+            Dive docs:{" "}
+            <Link
+              href="https://github.com/pRizz/dive"
+              target="_blank"
+              rel="noreferrer"
+            >
+              pRizz/dive
+            </Link>
+            <Typography
+              component="span"
+              aria-hidden="true"
+              sx={{ mx: 0.75, fontSize: "1rem", color: "text.disabled" }}
+            >
+              ·
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Layer changes docs:{" "}
-              <Link
-                href="https://github.com/pRizz/dive#file-tree"
-                target="_blank"
-                rel="noreferrer"
-              >
-                pRizz/dive
-              </Link>
+            Layer changes docs:{" "}
+            <Link
+              href="https://github.com/pRizz/dive#file-tree"
+              target="_blank"
+              rel="noreferrer"
+            >
+              pRizz/dive
+            </Link>
+            <Typography
+              component="span"
+              aria-hidden="true"
+              sx={{ mx: 0.75, fontSize: "1rem", color: "text.disabled" }}
+            >
+              ·
             </Typography>
             <Link
               href="https://github.com/wagoodman/dive"
@@ -282,7 +292,7 @@ export default function Analysis(props: {
             >
               wagoodman/dive (upstream)
             </Link>
-          </Stack>
+          </Typography>
         </Stack>
         <Stack direction="row" spacing={3} flexWrap="wrap" rowGap={3}>
           <Card variant="outlined">
