@@ -19,6 +19,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
+import ChevronRight from "@mui/icons-material/ChevronRight";
 import { FileChangeType, FileTreeNode, LayerFileTree } from "./models";
 import { formatBytes } from "./utils";
 
@@ -218,16 +219,31 @@ export default function FileTree(props: FileTreeProps) {
           {hasChildren ? (
             <ListItemButton
               onClick={() => toggleNode(nodeKey)}
+              aria-expanded={isExpanded}
               sx={{ pl: 2 + depth * 2 }}
             >
               <Stack direction="row" spacing={1} alignItems="center" flex={1}>
-                <Typography
-                  variant="body2"
-                  sx={{ width: 16, textAlign: "center" }}
-                  color="text.secondary"
+                <Box
+                  sx={{
+                    width: 16,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    color: "text.secondary",
+                    flexShrink: 0,
+                  }}
+                  aria-hidden="true"
                 >
-                  {isExpanded ? "v" : ">"}
-                </Typography>
+                  <ChevronRight
+                    fontSize="small"
+                    sx={(theme) => ({
+                      transform: isExpanded ? "rotate(90deg)" : "rotate(0deg)",
+                      transition: theme.transitions.create("transform", {
+                        duration: theme.transitions.duration.shortest,
+                      }),
+                    })}
+                  />
+                </Box>
                 <ListItemText
                   primary={
                     <Stack
