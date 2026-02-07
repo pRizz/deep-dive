@@ -38,6 +38,10 @@ Docker Desktop.
 
 Publishing guide: see `PUBLISHING.md`.
 
+## Support the project
+
+If Deep Dive is useful, you can [Like it on Docker Hub](https://hub.docker.com/extensions/prizz/deep-dive), [star it on GitHub](https://github.com/pRizz/deep-dive), and share written feedback in [GitHub Issues](https://github.com/pRizz/deep-dive/issues).
+
 ## Development
 
 Go through [the official docs](https://docs.docker.com/desktop/extensions-sdk/quickstart/) to understand the basic setting up of the Docker extension.

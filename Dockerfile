@@ -46,7 +46,7 @@ LABEL org.opencontainers.image.title="Deep Dive" \
     com.docker.desktop.extension.icon="https://raw.githubusercontent.com/pRizz/deep-dive/main/ui/public/scuba.svg" \
     com.docker.extension.publisher-url="https://github.com/pRizz" \
     com.docker.extension.categories="utility-tools" \
-    com.docker.extension.additional-urls='[{"title":"Documentation","url":"https://github.com/pRizz/deep-dive"}]' \
+    com.docker.extension.additional-urls='[{"title":"Documentation","url":"https://github.com/pRizz/deep-dive"},{"title":"Issues","url":"https://github.com/pRizz/deep-dive/issues"}]' \
     com.docker.extension.changelog="Various fixes and improvements. See <a href=\"https://github.com/pRizz/deep-dive/releases\">https://github.com/pRizz/deep-dive/releases</a> for details."
 
 COPY --from=builder /backend/bin/service /

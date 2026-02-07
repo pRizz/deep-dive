@@ -33,6 +33,8 @@ import CIGateDialog from "./cigatedialog";
 import ExportDialog from "./exportdialog";
 import HistoryList from "./history";
 import {
+  DOCKER_HUB_EXTENSION_URL,
+  GITHUB_ISSUES_URL,
   GITHUB_URL,
   LINKEDIN_URL,
   MEDIUM_URL,
@@ -1270,10 +1272,22 @@ export function App() {
             Prakhar Srivastav&apos;s work
           </Link>
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Free &amp; open source on{" "}
+        <Typography variant="caption" color="text.secondary">
+          Enjoying Deep Dive?{" "}
+          <Link
+            href={DOCKER_HUB_EXTENSION_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Like it on Docker Hub
+          </Link>{" "}
+          or{" "}
           <Link href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-            GitHub
+            star it on GitHub
+          </Link>
+          , or share feedback in{" "}
+          <Link href={GITHUB_ISSUES_URL} target="_blank" rel="noopener noreferrer">
+            Issues
           </Link>
           .
         </Typography>
