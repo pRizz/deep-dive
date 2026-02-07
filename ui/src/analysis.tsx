@@ -290,8 +290,9 @@ export default function Analysis(props: {
               target="_blank"
               rel="noreferrer"
             >
-              wagoodman/dive (upstream)
+              wagoodman/dive
             </Link>
+            {" "}(upstream)
           </Typography>
         </Stack>
         <Stack direction="row" spacing={3} flexWrap="wrap" rowGap={3}>
