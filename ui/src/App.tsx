@@ -16,6 +16,7 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  Fade,
   LinearProgress,
   Link,
   MenuItem,
@@ -43,6 +44,7 @@ import {
 } from './constants';
 import { extractId, formatBytes, formatRelativeTimeFromNow, getErrorMessage } from './utils';
 import { formatJobStatusDisplay } from './job-status';
+import { classifyBootstrapFailure } from './bootstrap-state';
 import {
   AnalysisResult,
   AnalysisSource,
@@ -71,6 +73,13 @@ interface DockerImage {
   CreatedAt?: string;
   Size?: number;
 }
+
+type BootstrapPhase =
+  | 'booting'
+  | 'ready'
+  | 'client_unavailable'
+  | 'backend_unavailable'
+  | 'dive_missing';
 
 const formatElapsed = (elapsedSeconds?: number) => {
   if (elapsedSeconds === undefined) {
@@ -390,7 +399,7 @@ function ImageList(props: ImageListProps) {
 export function App() {
   const [analysis, setAnalysisResult] = useState<AnalysisResult | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<'analysis' | 'history'>('analysis');
-  const [isCheckingDive, setCheckingDive] = useState<boolean>(false);
+  const [bootstrapPhase, setBootstrapPhase] = useState<BootstrapPhase>('booting');
   const [images, setImages] = useState<Image[]>([]);
   const [isDiveInstalled, setDiveInstalled] = useState<boolean>(false);
   const [clientError, setClientError] = useState<string | undefined>(undefined);
@@ -421,25 +430,6 @@ export function App() {
       return undefined;
     }
   }, []);
-
-  const checkDiveInstallation = useCallback(async () => {
-    if (!ddClient?.extension?.vm?.service) {
-      return;
-    }
-    setCheckingDive(true);
-    try {
-      await ddClient.extension.vm.service.get('/checkdive');
-      setDiveInstalled(true);
-      setClientError(undefined);
-    } catch (error) {
-      setDiveInstalled(false);
-      setClientError(getErrorMessage(error));
-    } finally {
-      setCheckingDive(false);
-    }
-  }, [ddClient]);
-
-  const isDiveMissing = clientError?.includes('Dive is not found');
 
   const readImages = useCallback(async () => {
     if (!ddClient) {
@@ -510,6 +500,40 @@ export function App() {
       setHistoryLoading(false);
     }
   }, [ddClient]);
+
+  const bootstrapApp = useCallback(async () => {
+    if (!ddClient) {
+      setBootstrapPhase('client_unavailable');
+      return;
+    }
+    if (!ddClient.extension?.vm?.service) {
+      setClientError('Backend service is unavailable.');
+      setBootstrapPhase('backend_unavailable');
+      return;
+    }
+
+    setBootstrapPhase('booting');
+    setClientError(undefined);
+
+    try {
+      await ddClient.extension.vm.service.get('/checkdive');
+      setDiveInstalled(true);
+      setClientError(undefined);
+    } catch (error) {
+      const message = getErrorMessage(error);
+      setDiveInstalled(false);
+      setClientError(message);
+      setBootstrapPhase(classifyBootstrapFailure(message));
+      return;
+    }
+
+    const [imagesResult] = await Promise.allSettled([getImages(), fetchHistory()]);
+    if (imagesResult.status === 'rejected') {
+      setClientError(getErrorMessage(imagesResult.reason));
+    }
+
+    setBootstrapPhase('ready');
+  }, [ddClient, fetchHistory, getImages]);
 
   const clearHistorySelections = (ids: string[]) => {
     if (ids.length === 0) {
@@ -799,17 +823,8 @@ export function App() {
   };
 
   useEffect(() => {
-    if (!ddClient) {
-      return;
-    }
-    if (!ddClient.extension?.vm?.service) {
-      setClientError('Backend service is unavailable.');
-      return;
-    }
-    checkDiveInstallation();
-    getImages();
-    fetchHistory();
-  }, [checkDiveInstallation, ddClient, fetchHistory, getImages]);
+    bootstrapApp();
+  }, [bootstrapApp]);
 
   useEffect(() => {
     if (!ddClient?.extension?.vm?.service || !jobId) {
@@ -899,7 +914,7 @@ export function App() {
   };
 
   const isJobActive = jobStatus === 'queued' || jobStatus === 'running';
-  const tabsEnabled = !!ddClient && isDiveInstalled && !isCheckingDive;
+  const tabsEnabled = bootstrapPhase === 'ready' && !!ddClient && isDiveInstalled;
 
   const errorHint = (() => {
     if (!jobMessage) {
@@ -1000,23 +1015,22 @@ export function App() {
         </Typography>
       </Stack>
       <Divider sx={{ mt: 4, mb: 4 }} orientation="horizontal" flexItem />
-      {!ddClient ? null : statusAlert}
-      {!ddClient ? null : (
-        <>
-          <ExportDialog
-            open={isExportDialogOpen}
-            onClose={() => setExportDialogOpen(false)}
-            onExport={handleExport}
+      {bootstrapPhase === 'booting' ? (
+        <Stack sx={{ mt: 8 }} direction="column" alignItems="center" spacing={2}>
+          <Box
+            component="img"
+            src="scuba.svg"
+            alt="Deep Dive"
+            aria-hidden="true"
+            sx={{ height: 64, width: 64 }}
           />
-          <CIGateDialog
-            open={isCIGateDialogOpen}
-            onClose={() => setCIGateDialogOpen(false)}
-            onGenerate={handleGenerateCIRules}
-            onDownload={handleDownloadCIRules}
-          />
-        </>
-      )}
-      {!ddClient ? (
+          <CircularProgress />
+          <Typography variant="body2" color="text.secondary">
+            Loading Deep Dive...
+          </Typography>
+        </Stack>
+      ) : null}
+      {bootstrapPhase === 'client_unavailable' ? (
         <Stack spacing={2}>
           <Alert severity="error">
             This UI must be run inside Docker Desktop. The extension API client is unavailable in a
@@ -1029,141 +1043,159 @@ export function App() {
           {clientError ? <Alert severity="warning">Details: {clientError}</Alert> : null}
         </Stack>
       ) : null}
-      {isCheckingDive ? (
-        <Stack sx={{ mt: 4 }} direction="column" alignItems="center">
-          <CircularProgress />
+      {bootstrapPhase === 'backend_unavailable' ? (
+        <Stack spacing={2}>
+          <Alert severity="error">Backend service is unavailable.</Alert>
+          <Alert severity="info">
+            Ensure the extension backend VM is running, then retry initialization.
+          </Alert>
+          {clientError ? <Alert severity="warning">Details: {clientError}</Alert> : null}
+          <Button variant="outlined" onClick={() => void bootstrapApp()}>
+            Retry initialization
+          </Button>
         </Stack>
-      ) : (
-        <></>
-      )}
-      {!ddClient ? null : !isDiveInstalled ? (
+      ) : null}
+      {bootstrapPhase === 'dive_missing' ? (
         <Stack spacing={2}>
           <Alert severity="warning">
             Dive is not available in the backend VM. Install it and try again.
           </Alert>
-          {isDiveMissing ? (
-            <Alert severity="info">
-              Install Dive in the backend VM image, rebuild the extension, and reinstall it in
-              Docker Desktop. Basic install options:
-              <Box component="ul" sx={{ pl: 2, mt: 1, mb: 0 }}>
-                <li>
-                  macOS (Homebrew): <code>brew install dive</code>
-                </li>
-                <li>
-                  Ubuntu/Debian: download the latest <code>.deb</code> and run{' '}
-                  <code>sudo apt install ./dive_&lt;version&gt;_linux_amd64.deb</code>
-                </li>
-                <li>
-                  RHEL/CentOS: download the latest <code>.rpm</code> and run{' '}
-                  <code>rpm -i dive_&lt;version&gt;_linux_amd64.rpm</code>
-                </li>
-              </Box>
-              For more options (Windows, Arch, Nix, Docker), see the Dive install docs (fork of{' '}
-              <Link
-                href="https://github.com/wagoodman/dive"
-                target="_blank"
-                rel="noopener noreferrer"
+          <Alert severity="info">
+            Install Dive in the backend VM image, rebuild the extension, and reinstall it in Docker
+            Desktop. Basic install options:
+            <Box component="ul" sx={{ pl: 2, mt: 1, mb: 0 }}>
+              <li>
+                macOS (Homebrew): <code>brew install dive</code>
+              </li>
+              <li>
+                Ubuntu/Debian: download the latest <code>.deb</code> and run{' '}
+                <code>sudo apt install ./dive_&lt;version&gt;_linux_amd64.deb</code>
+              </li>
+              <li>
+                RHEL/CentOS: download the latest <code>.rpm</code> and run{' '}
+                <code>rpm -i dive_&lt;version&gt;_linux_amd64.rpm</code>
+              </li>
+            </Box>
+            For more options (Windows, Arch, Nix, Docker), see the Dive install docs (fork of{' '}
+            <Link
+              href="https://github.com/wagoodman/dive"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              wagoodman/dive
+            </Link>
+            ).
+            <Box sx={{ mt: 1 }}>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() =>
+                  ddClient?.host.openExternal('https://github.com/pRizz/dive#installation')
+                }
               >
-                wagoodman/dive
-              </Link>
-              ).
-              <Box sx={{ mt: 1 }}>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={() =>
-                    ddClient?.host.openExternal('https://github.com/pRizz/dive#installation')
-                  }
-                >
-                  Open Dive install docs
-                </Button>
-              </Box>
-            </Alert>
-          ) : null}
+                Open Dive install docs
+              </Button>
+            </Box>
+          </Alert>
           {clientError ? <Alert severity="info">Details: {clientError}</Alert> : null}
-          <Button variant="outlined" onClick={() => checkDiveInstallation()}>
+          <Button variant="outlined" onClick={() => void bootstrapApp()}>
             Retry check
           </Button>
         </Stack>
-      ) : (
-        <>
-          <Box role="tabpanel" hidden={activeTab !== 'analysis'} sx={{ mt: 3 }}>
-            {analysis ? (
-              <Stack spacing={2}>
-                {completedStatusDisplay ? (
-                  <Typography variant="body2" color="text.secondary">
-                    {completedStatusDisplay.statusLine}
-                  </Typography>
-                ) : null}
-                <Analysis
-                  onExit={clearAnalysis}
-                  analysis={analysis}
-                  onOpenExport={() => setExportDialogOpen(true)}
-                  onOpenCIGate={() => setCIGateDialogOpen(true)}
-                  historyId={selectedHistoryId}
-                ></Analysis>
-              </Stack>
-            ) : compareIds ? (
-              <CompareView
-                leftId={compareIds.leftId}
-                rightId={compareIds.rightId}
-                onBack={() => setCompareIds(undefined)}
-                client={ddClient}
-              />
-            ) : (
-              <Stack spacing={3}>
-                <FormControl disabled={isJobActive}>
-                  <FormLabel id="analysis-source-label">Analysis source</FormLabel>
-                  <RadioGroup
-                    row
-                    aria-labelledby="analysis-source-label"
-                    value={source}
-                    onChange={(event) => setSource(event.target.value as AnalysisSource)}
-                  >
-                    <FormControlLabel value="docker" control={<Radio />} label="Docker engine" />
-                    <FormControlLabel
-                      value="docker-archive"
-                      control={<Radio />}
-                      label="Docker archive"
-                    />
-                  </RadioGroup>
-                </FormControl>
-                {source === 'docker' ? (
-                  <ImageList
-                    images={images}
-                    historyEntries={historyEntries}
-                    isJobActive={isJobActive}
-                    jobTarget={jobTarget}
-                    jobStatus={jobStatus}
-                    jobMessage={jobMessage}
-                    jobElapsedSeconds={jobElapsedSeconds}
-                    openHistoryEntry={openHistoryEntry}
-                    startAnalysis={startAnalysis}
-                    getImages={getImages}
-                  />
-                ) : (
-                  <ArchiveAnalyzer />
-                )}
-              </Stack>
-            )}
-          </Box>
-          <Box role="tabpanel" hidden={activeTab !== 'history'} sx={{ mt: 3 }}>
-            <HistoryList
-              entries={historyEntries}
-              isLoading={isHistoryLoading}
-              error={historyError}
-              onSelect={openHistoryEntry}
-              onDelete={deleteHistoryEntry}
-              onDeleteAll={deleteAllHistory}
-              compareSelection={compareSelection}
-              onCompareSelect={updateCompareSelection}
-              onCompareClear={clearCompareSelection}
-              onCompare={openCompareView}
-              disabled={isJobActive}
+      ) : null}
+      {bootstrapPhase === 'ready' ? (
+        <Fade in appear timeout={200}>
+          <Box>
+            {statusAlert}
+            <ExportDialog
+              open={isExportDialogOpen}
+              onClose={() => setExportDialogOpen(false)}
+              onExport={handleExport}
             />
+            <CIGateDialog
+              open={isCIGateDialogOpen}
+              onClose={() => setCIGateDialogOpen(false)}
+              onGenerate={handleGenerateCIRules}
+              onDownload={handleDownloadCIRules}
+            />
+            <Box role="tabpanel" hidden={activeTab !== 'analysis'} sx={{ mt: 3 }}>
+              {analysis ? (
+                <Stack spacing={2}>
+                  {completedStatusDisplay ? (
+                    <Typography variant="body2" color="text.secondary">
+                      {completedStatusDisplay.statusLine}
+                    </Typography>
+                  ) : null}
+                  <Analysis
+                    onExit={clearAnalysis}
+                    analysis={analysis}
+                    onOpenExport={() => setExportDialogOpen(true)}
+                    onOpenCIGate={() => setCIGateDialogOpen(true)}
+                    historyId={selectedHistoryId}
+                  ></Analysis>
+                </Stack>
+              ) : compareIds ? (
+                <CompareView
+                  leftId={compareIds.leftId}
+                  rightId={compareIds.rightId}
+                  onBack={() => setCompareIds(undefined)}
+                  client={ddClient}
+                />
+              ) : (
+                <Stack spacing={3}>
+                  <FormControl disabled={isJobActive}>
+                    <FormLabel id="analysis-source-label">Analysis source</FormLabel>
+                    <RadioGroup
+                      row
+                      aria-labelledby="analysis-source-label"
+                      value={source}
+                      onChange={(event) => setSource(event.target.value as AnalysisSource)}
+                    >
+                      <FormControlLabel value="docker" control={<Radio />} label="Docker engine" />
+                      <FormControlLabel
+                        value="docker-archive"
+                        control={<Radio />}
+                        label="Docker archive"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                  {source === 'docker' ? (
+                    <ImageList
+                      images={images}
+                      historyEntries={historyEntries}
+                      isJobActive={isJobActive}
+                      jobTarget={jobTarget}
+                      jobStatus={jobStatus}
+                      jobMessage={jobMessage}
+                      jobElapsedSeconds={jobElapsedSeconds}
+                      openHistoryEntry={openHistoryEntry}
+                      startAnalysis={startAnalysis}
+                      getImages={getImages}
+                    />
+                  ) : (
+                    <ArchiveAnalyzer />
+                  )}
+                </Stack>
+              )}
+            </Box>
+            <Box role="tabpanel" hidden={activeTab !== 'history'} sx={{ mt: 3 }}>
+              <HistoryList
+                entries={historyEntries}
+                isLoading={isHistoryLoading}
+                error={historyError}
+                onSelect={openHistoryEntry}
+                onDelete={deleteHistoryEntry}
+                onDeleteAll={deleteAllHistory}
+                compareSelection={compareSelection}
+                onCompareSelect={updateCompareSelection}
+                onCompareClear={clearCompareSelection}
+                onCompare={openCompareView}
+                disabled={isJobActive}
+              />
+            </Box>
           </Box>
-        </>
-      )}
+        </Fade>
+      ) : null}
       <Divider sx={{ mt: 6, mb: 3 }} />
       <Stack spacing={1} sx={{ textAlign: 'center', pb: 4 }}>
         <Typography variant="body2" color="text.secondary">
