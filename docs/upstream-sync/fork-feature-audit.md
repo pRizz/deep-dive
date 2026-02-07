@@ -3,3 +3,6 @@
 ## 2026-02-05
 - Switched bundled Dive CLI to the fork at [pRizz/dive](https://github.com/pRizz/dive) (DIVE_VERSION 0.14.7).
 - Updated UI, README, and extension metadata to point to the fork and note it is a fork of [wagoodman/dive](https://github.com/wagoodman/dive).
+
+## 2026-02-07
+- Updated the Dockerfile to resolve and install the latest stable [pRizz/dive](https://github.com/pRizz/dive) release at build time (instead of a pinned `DIVE_VERSION`).

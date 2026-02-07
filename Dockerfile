@@ -20,7 +20,12 @@ COPY ui ui
 RUN bun run --cwd ui build
 
 FROM alpine
-ARG DIVE_VERSION=0.14.7
+# Always resolve the latest stable pRizz/dive release at build time so this
+# extension tracks our fork automatically, including future major versions.
+# A primary reason for maintaining the fork is to address Docker Scout
+# vulnerability warnings that come from stale upstream dive dependencies.
+# Fail fast if release metadata or download resolution breaks to avoid shipping
+# a stale or partially configured image.
 RUN apk add --no-cache ca-certificates curl tar \
     && ALPINE_ARCH="$(apk --print-arch)" \
     && echo "Detected Alpine arch: ${ALPINE_ARCH}" \
@@ -30,9 +35,14 @@ RUN apk add --no-cache ca-certificates curl tar \
       *) echo "Unsupported arch: ${ALPINE_ARCH}"; exit 1 ;; \
     esac \
     && echo "Using Dive arch: ${DIVE_ARCH}" \
-    && echo "Kernel: $(uname -a)" \
-    && curl -fsSL "https://github.com/pRizz/dive/releases/download/v${DIVE_VERSION}/dive_${DIVE_VERSION}_linux_${DIVE_ARCH}.tar.gz" \
-      | tar -xz -C /usr/local/bin dive \
+    && DIVE_RELEASE_JSON="$(curl -fsSL -H 'Accept: application/vnd.github+json' https://api.github.com/repos/pRizz/dive/releases/latest)" \
+    && DIVE_TAG="$(printf '%s\n' "${DIVE_RELEASE_JSON}" | awk -F'\"' '/\"tag_name\":/ { print $4; exit }')" \
+    && DIVE_TARBALL_URL="$(printf '%s\n' "${DIVE_RELEASE_JSON}" | awk -v arch="${DIVE_ARCH}" -F'\"' '/\"browser_download_url\":/ { if ($4 ~ ("_linux_" arch "\\.tar\\.gz$")) { print $4; exit } }')" \
+    && if [ -z "${DIVE_TAG}" ]; then echo "Failed to resolve pRizz/dive latest tag_name." >&2; exit 1; fi \
+    && if [ -z "${DIVE_TARBALL_URL}" ]; then echo "Failed to resolve pRizz/dive Linux tarball for arch ${DIVE_ARCH}." >&2; exit 1; fi \
+    && echo "Resolved pRizz/dive release: ${DIVE_TAG}" \
+    && echo "Resolved pRizz/dive asset: ${DIVE_TARBALL_URL}" \
+    && curl -fsSL "${DIVE_TARBALL_URL}" | tar -xz -C /usr/local/bin dive \
     && chmod +x /usr/local/bin/dive
 LABEL org.opencontainers.image.title="Deep Dive" \
     org.opencontainers.image.description="Explore docker images, layer contents, and discover ways to shrink the size of your Docker/OCI image." \
