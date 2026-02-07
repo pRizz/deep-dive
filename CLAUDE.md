@@ -41,6 +41,11 @@
 3. Re-run `just check`.
 4. Commit only when the checks pass.
 
+## Git push default
+
+- When asked to push and no branch is specified, push to `main`.
+- Only push to a different branch when explicitly requested in the current thread.
+
 ## Release sanity checks
 
 Before publish/release-related changes:

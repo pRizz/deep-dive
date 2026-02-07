@@ -53,6 +53,11 @@ just fix
 
 Then re-run `just check`.
 
+## Git push default
+
+- When asked to push and no branch is specified, push to `main`.
+- Only push to a different branch when explicitly requested in the current thread.
+
 ## PR readiness checklist
 
 - [ ] `just check` passes locally.
