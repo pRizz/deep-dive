@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from 'react';
 import {
   Box,
   Chip,
@@ -18,12 +18,12 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
-} from "@mui/material";
-import ChevronRight from "@mui/icons-material/ChevronRight";
-import { FileChangeType, FileTreeNode, LayerFileTree } from "./models";
-import { formatBytes } from "./utils";
+} from '@mui/material';
+import ChevronRight from '@mui/icons-material/ChevronRight';
+import { FileChangeType, FileTreeNode, LayerFileTree } from './models';
+import { formatBytes } from './utils';
 
-type ChangeFilter = "all" | "added" | "modified" | "removed";
+type ChangeFilter = 'all' | 'added' | 'modified' | 'removed';
 
 interface FileTreeProps {
   aggregateTree: FileTreeNode[];
@@ -31,38 +31,33 @@ interface FileTreeProps {
 }
 
 const changeLabels: Record<FileChangeType, string> = {
-  added: "Added",
-  modified: "Modified",
-  removed: "Removed",
-  unchanged: "Unchanged",
-  unknown: "Unknown",
+  added: 'Added',
+  modified: 'Modified',
+  removed: 'Removed',
+  unchanged: 'Unchanged',
+  unknown: 'Unknown',
 };
 
 function changeChipColor(change: FileChangeType) {
   switch (change) {
-    case "added":
-      return "success";
-    case "modified":
-      return "warning";
-    case "removed":
-      return "error";
+    case 'added':
+      return 'success';
+    case 'modified':
+      return 'warning';
+    case 'removed':
+      return 'error';
     default:
-      return "default";
+      return 'default';
   }
 }
 
-function filterTreeByChange(
-  nodes: FileTreeNode[],
-  filter: ChangeFilter
-): FileTreeNode[] {
-  if (filter === "all") {
+function filterTreeByChange(nodes: FileTreeNode[], filter: ChangeFilter): FileTreeNode[] {
+  if (filter === 'all') {
     return nodes;
   }
   const filtered: FileTreeNode[] = [];
   nodes.forEach((node) => {
-    const children = node.children
-      ? filterTreeByChange(node.children, filter)
-      : [];
+    const children = node.children ? filterTreeByChange(node.children, filter) : [];
     const matches = node.change === filter;
     if (matches || children.length > 0) {
       filtered.push({
@@ -75,13 +70,11 @@ function filterTreeByChange(
 }
 
 function getLayerLabel(layer: LayerFileTree, fallbackIndex: number) {
-  const indexLabel =
-    layer.layerIndex !== undefined ? layer.layerIndex : fallbackIndex;
-  const commandLabel = layer.command ? layer.command.substring(0, 40) : "";
-  const sizeLabel =
-    typeof layer.sizeBytes === "number" ? formatBytes(layer.sizeBytes) : "";
+  const indexLabel = layer.layerIndex !== undefined ? layer.layerIndex : fallbackIndex;
+  const commandLabel = layer.command ? layer.command.substring(0, 40) : '';
+  const sizeLabel = typeof layer.sizeBytes === 'number' ? formatBytes(layer.sizeBytes) : '';
   const parts = [sizeLabel, commandLabel].filter(Boolean);
-  const suffix = parts.length > 0 ? ` — ${parts.join(" — ")}` : "";
+  const suffix = parts.length > 0 ? ` — ${parts.join(' — ')}` : '';
   return `Layer ${indexLabel}${suffix}`;
 }
 
@@ -90,24 +83,22 @@ function calculateTreeSize(nodes: FileTreeNode[]): number {
     if (node.children && node.children.length > 0) {
       return node.children.reduce((total, child) => total + visit(child), 0);
     }
-    return typeof node.sizeBytes === "number" ? node.sizeBytes : 0;
+    return typeof node.sizeBytes === 'number' ? node.sizeBytes : 0;
   };
   return nodes.reduce((total, node) => total + visit(node), 0);
 }
 
 export default function FileTree(props: FileTreeProps) {
-  const [selectedLayer, setSelectedLayer] = useState<string>("aggregate");
+  const [selectedLayer, setSelectedLayer] = useState<string>('aggregate');
   const [hasSetInitialLayer, setHasSetInitialLayer] = useState(false);
-  const [changeFilter, setChangeFilter] = useState<ChangeFilter>("all");
+  const [changeFilter, setChangeFilter] = useState<ChangeFilter>('all');
   const [sortBySize, setSortBySize] = useState(true);
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(
-    () => new Set()
-  );
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(() => new Set());
 
   const layers = useMemo(() => props.layers ?? [], [props.layers]);
   const aggregateSizeBytes = useMemo(
     () => calculateTreeSize(props.aggregateTree ?? []),
-    [props.aggregateTree]
+    [props.aggregateTree],
   );
   const largestLayerKey = useMemo(() => {
     if (layers.length === 0) {
@@ -135,19 +126,18 @@ export default function FileTree(props: FileTreeProps) {
     }
   }, [hasSetInitialLayer, largestLayerKey, layers.length]);
   const activeTree = useMemo(() => {
-    if (selectedLayer === "aggregate") {
+    if (selectedLayer === 'aggregate') {
       return props.aggregateTree ?? [];
     }
     const match = layers.find(
-      (layer, index) =>
-        String(layer.layerIndex ?? index) === selectedLayer
+      (layer, index) => String(layer.layerIndex ?? index) === selectedLayer,
     );
     return match?.tree ?? [];
   }, [layers, props.aggregateTree, selectedLayer]);
 
   const filteredTree = useMemo(
     () => filterTreeByChange(activeTree, changeFilter),
-    [activeTree, changeFilter]
+    [activeTree, changeFilter],
   );
 
   const sortedTree = useMemo(() => {
@@ -186,22 +176,14 @@ export default function FileTree(props: FileTreeProps) {
     });
   };
 
-  const renderNode = (
-    node: FileTreeNode,
-    depth: number,
-    index: number,
-    parentKey: string
-  ) => {
+  const renderNode = (node: FileTreeNode, depth: number, index: number, parentKey: string) => {
     const nodeKey = `${parentKey}/${node.path || node.name}-${index}`;
     const hasChildren = Boolean(node.children && node.children.length > 0);
     const isExpanded = expandedNodes.has(nodeKey);
     const changeLabel = node.change ? changeLabels[node.change] : undefined;
     const showChange =
-      node.change === "added" ||
-      node.change === "modified" ||
-      node.change === "removed";
-    const sizeLabel =
-      typeof node.sizeBytes === "number" ? formatBytes(node.sizeBytes) : "";
+      node.change === 'added' || node.change === 'modified' || node.change === 'removed';
+    const sizeLabel = typeof node.sizeBytes === 'number' ? formatBytes(node.sizeBytes) : '';
 
     const secondaryParts = [];
     if (node.path && node.path !== node.name) {
@@ -210,8 +192,7 @@ export default function FileTree(props: FileTreeProps) {
     if (sizeLabel) {
       secondaryParts.push(sizeLabel);
     }
-    const secondaryText =
-      secondaryParts.length > 0 ? secondaryParts.join(" | ") : undefined;
+    const secondaryText = secondaryParts.length > 0 ? secondaryParts.join(' | ') : undefined;
 
     return (
       <Box key={nodeKey}>
@@ -226,10 +207,10 @@ export default function FileTree(props: FileTreeProps) {
                 <Box
                   sx={{
                     width: 16,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    color: "text.secondary",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    color: 'text.secondary',
                     flexShrink: 0,
                   }}
                   aria-hidden="true"
@@ -237,8 +218,8 @@ export default function FileTree(props: FileTreeProps) {
                   <ChevronRight
                     fontSize="small"
                     sx={(theme) => ({
-                      transform: isExpanded ? "rotate(90deg)" : "rotate(0deg)",
-                      transition: theme.transitions.create("transform", {
+                      transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                      transition: theme.transitions.create('transform', {
                         duration: theme.transitions.duration.shortest,
                       }),
                     })}
@@ -246,19 +227,14 @@ export default function FileTree(props: FileTreeProps) {
                 </Box>
                 <ListItemText
                   primary={
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      alignItems="center"
-                      flexWrap="wrap"
-                    >
+                    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                       <Typography variant="body2">{node.name}</Typography>
                       {showChange ? (
                         <Chip
                           label={changeLabel}
                           size="small"
                           variant="outlined"
-                          color={changeChipColor(node.change ?? "unknown")}
+                          color={changeChipColor(node.change ?? 'unknown')}
                         />
                       ) : null}
                     </Stack>
@@ -274,22 +250,17 @@ export default function FileTree(props: FileTreeProps) {
               </Stack>
             </ListItemButton>
           ) : (
-            <Box sx={{ px: 2, py: 1, pl: 2 + depth * 2, width: "100%" }}>
+            <Box sx={{ px: 2, py: 1, pl: 2 + depth * 2, width: '100%' }}>
               <ListItemText
                 primary={
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    alignItems="center"
-                    flexWrap="wrap"
-                  >
+                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                     <Typography variant="body2">{node.name}</Typography>
                     {showChange ? (
                       <Chip
                         label={changeLabel}
                         size="small"
                         variant="outlined"
-                        color={changeChipColor(node.change ?? "unknown")}
+                        color={changeChipColor(node.change ?? 'unknown')}
                       />
                     ) : null}
                   </Stack>
@@ -309,7 +280,7 @@ export default function FileTree(props: FileTreeProps) {
           <Collapse in={isExpanded} timeout="auto" unmountOnExit>
             <List disablePadding>
               {node.children?.map((child, childIndex) =>
-                renderNode(child, depth + 1, childIndex, nodeKey)
+                renderNode(child, depth + 1, childIndex, nodeKey),
               )}
             </List>
           </Collapse>
@@ -320,17 +291,12 @@ export default function FileTree(props: FileTreeProps) {
 
   const hasLayerOptions = layers.length > 0;
   const aggregateLabelSuffix =
-    aggregateSizeBytes > 0 ? ` — ${formatBytes(aggregateSizeBytes)}` : "";
+    aggregateSizeBytes > 0 ? ` — ${formatBytes(aggregateSizeBytes)}` : '';
 
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
       <Stack spacing={2}>
-        <Stack
-          direction="row"
-          spacing={2}
-          alignItems="center"
-          flexWrap="wrap"
-        >
+        <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
           <FormControl size="small" sx={{ minWidth: 220 }}>
             <InputLabel id="layer-select-label">Layer view</InputLabel>
             <Select
@@ -344,10 +310,7 @@ export default function FileTree(props: FileTreeProps) {
                 {`Aggregate (all layers)${aggregateLabelSuffix}`}
               </MenuItem>
               {layers.map((layer, index) => (
-                <MenuItem
-                  key={layer.layerId ?? index}
-                  value={String(layer.layerIndex ?? index)}
-                >
+                <MenuItem key={layer.layerId ?? index} value={String(layer.layerIndex ?? index)}>
                   {getLayerLabel(layer, index)}
                 </MenuItem>
               ))}
@@ -366,9 +329,7 @@ export default function FileTree(props: FileTreeProps) {
             value={changeFilter}
             exclusive
             size="small"
-            onChange={(_, value) =>
-              setChangeFilter(value === null ? "all" : value)
-            }
+            onChange={(_, value) => setChangeFilter(value === null ? 'all' : value)}
           >
             <ToggleButton value="all">All changes</ToggleButton>
             <ToggleButton value="added">Added</ToggleButton>
@@ -385,9 +346,7 @@ export default function FileTree(props: FileTreeProps) {
           </Typography>
         ) : (
           <List dense disablePadding>
-            {sortedTree.map((node, index) =>
-              renderNode(node, 0, index, "root")
-            )}
+            {sortedTree.map((node, index) => renderNode(node, 0, index, 'root'))}
           </List>
         )}
       </Stack>

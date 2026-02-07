@@ -117,6 +117,9 @@ If validation passes, Docker’s extensions team authorizes publication. ([GitHu
 Publishing for Deep Dive is currently semi-manual. CI will create a new git tag,
 then we manually run `scripts/push-latest-tag.sh` to build and push the image.
 
+Before triggering release/publish, run `just check` locally to match CI quality
+gates (Biome format/lint, UI tests/build, and Go format/test/vet).
+
 ---
 
 [1]: https://docs.docker.com/extensions/extensions-sdk/architecture/metadata/ "Extension metadata"

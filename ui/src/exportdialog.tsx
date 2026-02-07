@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Button,
@@ -12,8 +12,8 @@ import {
   RadioGroup,
   Stack,
   Typography,
-} from "@mui/material";
-import { ExportFormat } from "./models";
+} from '@mui/material';
+import { ExportFormat } from './models';
 
 export default function ExportDialog(props: {
   open: boolean;
@@ -21,13 +21,13 @@ export default function ExportDialog(props: {
   onExport: (format: ExportFormat) => Promise<void>;
 }) {
   const { open, onClose, onExport } = props;
-  const [format, setFormat] = useState<ExportFormat>("json");
+  const [format, setFormat] = useState<ExportFormat>('json');
   const [isExporting, setExporting] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (!open) {
-      setFormat("json");
+      setFormat('json');
       setError(undefined);
       setExporting(false);
     }
@@ -71,12 +71,8 @@ export default function ExportDialog(props: {
         <Button onClick={onClose} disabled={isExporting}>
           Cancel
         </Button>
-        <Button
-          variant="contained"
-          onClick={handleExport}
-          disabled={isExporting}
-        >
-          {isExporting ? "Exporting..." : "Export"}
+        <Button variant="contained" onClick={handleExport} disabled={isExporting}>
+          {isExporting ? 'Exporting...' : 'Export'}
         </Button>
       </DialogActions>
     </Dialog>

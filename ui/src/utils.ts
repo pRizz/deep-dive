@@ -10,14 +10,14 @@ import {
   HistorySummary,
   NormalizedFileTree,
   DiveLayer,
-} from "./models";
+} from './models';
 
 export function formatBytes(bytes: number, decimals = 2) {
-  if (!+bytes) return "0 Bytes";
+  if (!+bytes) return '0 Bytes';
 
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
@@ -26,7 +26,7 @@ export function formatBytes(bytes: number, decimals = 2) {
 
 export function formatPercent(value: number, decimals = 1) {
   if (!Number.isFinite(value)) {
-    return "0%";
+    return '0%';
   }
   return `${(value * 100).toFixed(decimals)}%`;
 }
@@ -38,39 +38,36 @@ export function formatRelativeTimeFromNow(timestampMs: number) {
   const absSeconds = Math.abs(diffSeconds);
 
   const units: Array<{ limit: number; unit: Intl.RelativeTimeFormatUnit }> = [
-    { limit: 60, unit: "second" },
-    { limit: 3600, unit: "minute" },
-    { limit: 86400, unit: "hour" },
-    { limit: 2592000, unit: "day" },
-    { limit: 31536000, unit: "month" },
-    { limit: Infinity, unit: "year" },
+    { limit: 60, unit: 'second' },
+    { limit: 3600, unit: 'minute' },
+    { limit: 86400, unit: 'hour' },
+    { limit: 2592000, unit: 'day' },
+    { limit: 31536000, unit: 'month' },
+    { limit: Infinity, unit: 'year' },
   ];
 
   let value = diffSeconds;
-  let unit: Intl.RelativeTimeFormatUnit = "second";
+  let unit: Intl.RelativeTimeFormatUnit = 'second';
 
   for (const entry of units) {
     if (absSeconds < entry.limit) {
       unit = entry.unit;
-      if (unit === "minute") {
+      if (unit === 'minute') {
         value = Math.round(diffSeconds / 60);
-      } else if (unit === "hour") {
+      } else if (unit === 'hour') {
         value = Math.round(diffSeconds / 3600);
-      } else if (unit === "day") {
+      } else if (unit === 'day') {
         value = Math.round(diffSeconds / 86400);
-      } else if (unit === "month") {
+      } else if (unit === 'month') {
         value = Math.round(diffSeconds / 2592000);
-      } else if (unit === "year") {
+      } else if (unit === 'year') {
         value = Math.round(diffSeconds / 31536000);
       }
       break;
     }
   }
 
-  return new Intl.RelativeTimeFormat(undefined, { numeric: "auto" }).format(
-    value,
-    unit
-  );
+  return new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' }).format(value, unit);
 }
 
 export function calculatePercent(part: number, total: number) {
@@ -81,17 +78,17 @@ export function calculatePercent(part: number, total: number) {
 }
 
 export function extractId(id: string) {
-  return id.replace("sha256:", "").substring(0, 12);
+  return id.replace('sha256:', '').substring(0, 12);
 }
 
 export function joinUrl(base: string, path: string) {
-  const trimmedBase = base.replace(/\/$/, "");
-  const trimmedPath = path.startsWith("/") ? path : `/${path}`;
+  const trimmedBase = base.replace(/\/$/, '');
+  const trimmedPath = path.startsWith('/') ? path : `/${path}`;
   return `${trimmedBase}${trimmedPath}`;
 }
 
 export function getErrorMessage(error: unknown) {
-  if (typeof error === "string") {
+  if (typeof error === 'string') {
     return error;
   }
 
@@ -99,13 +96,13 @@ export function getErrorMessage(error: unknown) {
     return error.message;
   }
 
-  if (error && typeof error === "object") {
+  if (error && typeof error === 'object') {
     const maybeMessage = (error as { message?: unknown }).message;
-    if (typeof maybeMessage === "string") {
+    if (typeof maybeMessage === 'string') {
       return maybeMessage;
     }
     const maybeCapitalMessage = (error as { Message?: unknown }).Message;
-    if (typeof maybeCapitalMessage === "string") {
+    if (typeof maybeCapitalMessage === 'string') {
       return maybeCapitalMessage;
     }
 
@@ -120,13 +117,10 @@ export function getErrorMessage(error: unknown) {
 }
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function readFirstValue(
-  record: Record<string, unknown>,
-  keys: string[]
-): unknown {
+function readFirstValue(record: Record<string, unknown>, keys: string[]): unknown {
   for (const key of keys) {
     if (key in record) {
       return record[key];
@@ -144,10 +138,10 @@ function readFirstValue(
 }
 
 function toNumber(value: unknown): number | undefined {
-  if (typeof value === "number" && Number.isFinite(value)) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
   }
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const parsed = Number(value);
     if (Number.isFinite(parsed)) {
       return parsed;
@@ -157,25 +151,25 @@ function toNumber(value: unknown): number | undefined {
 }
 
 function toStringValue(value: unknown): string | undefined {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     return value;
   }
-  if (typeof value === "number" || typeof value === "boolean") {
+  if (typeof value === 'number' || typeof value === 'boolean') {
     return String(value);
   }
   return undefined;
 }
 
 function toBoolean(value: unknown): boolean | undefined {
-  if (typeof value === "boolean") {
+  if (typeof value === 'boolean') {
     return value;
   }
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const normalized = value.trim().toLowerCase();
-    if (["true", "yes", "1"].includes(normalized)) {
+    if (['true', 'yes', '1'].includes(normalized)) {
       return true;
     }
-    if (["false", "no", "0"].includes(normalized)) {
+    if (['false', 'no', '0'].includes(normalized)) {
       return false;
     }
   }
@@ -183,7 +177,7 @@ function toBoolean(value: unknown): boolean | undefined {
 }
 
 function getNameFromPath(pathValue: string) {
-  const normalized = pathValue.split("/").filter(Boolean);
+  const normalized = pathValue.split('/').filter(Boolean);
   if (normalized.length === 0) {
     return pathValue;
   }
@@ -191,119 +185,106 @@ function getNameFromPath(pathValue: string) {
 }
 
 export function normalizeChangeType(value: unknown): FileChangeType {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const normalized = value.trim().toLowerCase();
-    if (["add", "added", "new", "create", "created", "a"].includes(normalized)) {
-      return "added";
+    if (['add', 'added', 'new', 'create', 'created', 'a'].includes(normalized)) {
+      return 'added';
     }
     if (
-      ["modify", "modified", "change", "changed", "update", "updated", "m"].includes(
-        normalized
-      )
+      ['modify', 'modified', 'change', 'changed', 'update', 'updated', 'm'].includes(normalized)
     ) {
-      return "modified";
+      return 'modified';
     }
-    if (
-      ["remove", "removed", "delete", "deleted", "del", "d"].includes(normalized)
-    ) {
-      return "removed";
+    if (['remove', 'removed', 'delete', 'deleted', 'del', 'd'].includes(normalized)) {
+      return 'removed';
     }
-    if (["same", "unchanged", "nochange", "none", "u"].includes(normalized)) {
-      return "unchanged";
+    if (['same', 'unchanged', 'nochange', 'none', 'u'].includes(normalized)) {
+      return 'unchanged';
     }
   }
-  return "unknown";
+  return 'unknown';
 }
 
 export function normalizeFileNodeType(
   value: unknown,
-  flags?: { isDir?: boolean; isFile?: boolean; isLink?: boolean }
+  flags?: { isDir?: boolean; isFile?: boolean; isLink?: boolean },
 ): FileNodeType {
   if (flags?.isDir) {
-    return "directory";
+    return 'directory';
   }
   if (flags?.isFile) {
-    return "file";
+    return 'file';
   }
   if (flags?.isLink) {
-    return "link";
+    return 'link';
   }
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const normalized = value.trim().toLowerCase();
-    if (["dir", "directory", "folder"].includes(normalized)) {
-      return "directory";
+    if (['dir', 'directory', 'folder'].includes(normalized)) {
+      return 'directory';
     }
-    if (["file", "regular"].includes(normalized)) {
-      return "file";
+    if (['file', 'regular'].includes(normalized)) {
+      return 'file';
     }
-    if (["link", "symlink"].includes(normalized)) {
-      return "link";
+    if (['link', 'symlink'].includes(normalized)) {
+      return 'link';
     }
   }
-  return "unknown";
+  return 'unknown';
 }
 
 function normalizeFileTreeNode(raw: unknown): FileTreeNode | null {
-  if (typeof raw === "string") {
+  if (typeof raw === 'string') {
     return {
       name: getNameFromPath(raw),
       path: raw,
-      fileType: "unknown",
-      change: "unknown",
+      fileType: 'unknown',
+      change: 'unknown',
     };
   }
   if (!isRecord(raw)) {
     return null;
   }
 
-  const name =
-    toStringValue(
-      readFirstValue(raw, ["name", "file", "filename", "label"])
-    ) ?? "";
+  const name = toStringValue(readFirstValue(raw, ['name', 'file', 'filename', 'label'])) ?? '';
   const path =
-    toStringValue(
-      readFirstValue(raw, ["path", "fullPath", "absolutePath", "filePath"])
-    ) ?? "";
+    toStringValue(readFirstValue(raw, ['path', 'fullPath', 'absolutePath', 'filePath'])) ?? '';
   const derivedPath = path || name;
-  const nodePath = derivedPath || "unknown";
-  const nodeName = name || (derivedPath ? getNameFromPath(derivedPath) : "unknown");
+  const nodePath = derivedPath || 'unknown';
+  const nodeName = name || (derivedPath ? getNameFromPath(derivedPath) : 'unknown');
 
   const size = toNumber(
-    readFirstValue(raw, ["sizeBytes", "size", "bytes", "totalSize", "fileSize"])
+    readFirstValue(raw, ['sizeBytes', 'size', 'bytes', 'totalSize', 'fileSize']),
   );
 
   const change = normalizeChangeType(
-    readFirstValue(raw, ["change", "changeType", "status", "diffType", "diff"])
+    readFirstValue(raw, ['change', 'changeType', 'status', 'diffType', 'diff']),
   );
 
-  const linkName = toStringValue(
-    readFirstValue(raw, ["linkName", "symlinkTarget", "linkTarget"])
-  );
-  const isDir = toBoolean(readFirstValue(raw, ["isDir", "isDirectory", "dir"]));
-  const isFile = toBoolean(readFirstValue(raw, ["isFile", "file"]));
-  const isLink =
-    toBoolean(readFirstValue(raw, ["isLink", "symlink"])) ??
-    Boolean(linkName);
+  const linkName = toStringValue(readFirstValue(raw, ['linkName', 'symlinkTarget', 'linkTarget']));
+  const isDir = toBoolean(readFirstValue(raw, ['isDir', 'isDirectory', 'dir']));
+  const isFile = toBoolean(readFirstValue(raw, ['isFile', 'file']));
+  const isLink = toBoolean(readFirstValue(raw, ['isLink', 'symlink'])) ?? Boolean(linkName);
 
   const fileType = normalizeFileNodeType(
-    readFirstValue(raw, ["fileType", "type", "kind", "nodeType"]),
+    readFirstValue(raw, ['fileType', 'type', 'kind', 'nodeType']),
     {
       isDir,
       isFile,
       isLink,
-    }
+    },
   );
 
   const childrenRaw = readFirstValue(raw, [
-    "children",
-    "entries",
-    "files",
-    "fileList",
-    "nodes",
-    "tree",
-    "fileTree",
-    "filetree",
-    "contents",
+    'children',
+    'entries',
+    'files',
+    'fileList',
+    'nodes',
+    'tree',
+    'fileTree',
+    'filetree',
+    'contents',
   ]);
   const children = normalizeFileTreeNodes(childrenRaw);
 
@@ -340,7 +321,7 @@ export function normalizeDiveFileTrees(dive: DiveResponse): NormalizedFileTree {
     dive.files,
     dive.root,
   ];
-  
+
   // Also check nested under image object (Dive may store aggregate tree here)
   const imageRecord = dive.image as unknown as Record<string, unknown>;
   const imageCandidates = imageRecord
@@ -353,11 +334,11 @@ export function normalizeDiveFileTrees(dive: DiveResponse): NormalizedFileTree {
         imageRecord.root,
       ]
     : [];
-  
+
   const aggregateCandidates = [...topLevelCandidates, ...imageCandidates];
 
   let aggregate = normalizeFileTreeNodes(
-    aggregateCandidates.find((candidate) => Boolean(candidate))
+    aggregateCandidates.find((candidate) => Boolean(candidate)),
   );
 
   const layers = (dive.layer ?? []).map((layer) => {
@@ -378,9 +359,7 @@ export function normalizeDiveFileTrees(dive: DiveResponse): NormalizedFileTree {
       layerIndex: layer.index,
       command: layer.command,
       sizeBytes: layer.sizeBytes,
-      tree: normalizeFileTreeNodes(
-        layerCandidates.find((candidate) => Boolean(candidate))
-      ),
+      tree: normalizeFileTreeNodes(layerCandidates.find((candidate) => Boolean(candidate))),
     };
   });
 
@@ -402,7 +381,7 @@ function ensureChild(
   parent: TreeBuilderNode,
   name: string,
   path: string,
-  fileType: FileNodeType
+  fileType: FileNodeType,
 ): TreeBuilderNode {
   if (!parent.childrenMap) {
     parent.childrenMap = new Map();
@@ -415,7 +394,7 @@ function ensureChild(
     name,
     path,
     fileType,
-    change: "unknown",
+    change: 'unknown',
   };
   parent.childrenMap.set(name, node);
   return node;
@@ -429,9 +408,9 @@ function finalizeTree(node: TreeBuilderNode): FileTreeNode {
     : undefined;
   const { childrenMap, ...rest } = node;
   if (children && children.length > 0) {
-    if (rest.fileType === "directory") {
+    if (rest.fileType === 'directory') {
       const summedSize = children.reduce((total, child) => {
-        if (typeof child.sizeBytes === "number") {
+        if (typeof child.sizeBytes === 'number') {
           return total + child.sizeBytes;
         }
         return total;
@@ -451,16 +430,16 @@ function buildTreeFromFlatList(entries: FileTreeNode[]): FileTreeNode[] {
   // 2) On finalize, walk back up to aggregate directory sizes from children.
   // This keeps the whole transformation O(N) for N nodes.
   const root: TreeBuilderNode = {
-    name: "root",
-    path: "",
-    fileType: "directory",
-    change: "unknown",
+    name: 'root',
+    path: '',
+    fileType: 'directory',
+    change: 'unknown',
     childrenMap: new Map(),
   };
 
   entries.forEach((entry) => {
     const path = entry.path || entry.name;
-    const parts = path.split("/").filter(Boolean);
+    const parts = path.split('/').filter(Boolean);
     if (parts.length === 0) {
       return;
     }
@@ -468,14 +447,12 @@ function buildTreeFromFlatList(entries: FileTreeNode[]): FileTreeNode[] {
     for (let i = 0; i < parts.length; i += 1) {
       const part = parts[i];
       const isLeaf = i === parts.length - 1;
-      const nextPath = parts.slice(0, i + 1).join("/");
-      const nodeType: FileNodeType = isLeaf
-        ? entry.fileType ?? "unknown"
-        : "directory";
+      const nextPath = parts.slice(0, i + 1).join('/');
+      const nodeType: FileNodeType = isLeaf ? (entry.fileType ?? 'unknown') : 'directory';
       const child = ensureChild(current, part, nextPath, nodeType);
       if (isLeaf) {
         child.sizeBytes = entry.sizeBytes;
-        child.change = entry.change ?? "unknown";
+        child.change = entry.change ?? 'unknown';
       }
       current = child;
     }
@@ -495,9 +472,7 @@ export function hasDiveFileList(dive: DiveResponse): boolean {
  * Builds per-layer trees and an aggregate tree using only fileList data.
  * This is a fallback when Dive does not provide native tree structures.
  */
-export function buildDiveFileTreesFromFileList(
-  dive: DiveResponse
-): NormalizedFileTree {
+export function buildDiveFileTreesFromFileList(dive: DiveResponse): NormalizedFileTree {
   const aggregate = buildAggregateTreeFromFileList(dive.layer ?? []);
   const layers = (dive.layer ?? []).map((layer) => {
     const flatNodes = getFileListEntries(layer);
@@ -528,16 +503,14 @@ function getFileListEntries(layer: DiveLayer): FileTreeNode[] {
  * Normalizes file list paths so they can be used as stable map keys.
  */
 function normalizeFileListPath(pathValue: string): string | undefined {
-  const trimmed = pathValue.replace(/\/+$/, "");
+  const trimmed = pathValue.replace(/\/+$/, '');
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
 /**
  * Merges layer fileList entries using last-layer-wins semantics per path.
  */
-function collectFileListEntriesByPath(
-  layers: DiveLayer[]
-): Map<string, FileTreeNode> {
+function collectFileListEntriesByPath(layers: DiveLayer[]): Map<string, FileTreeNode> {
   const entriesByPath = new Map<string, FileTreeNode>();
 
   layers.forEach((layer) => {
@@ -584,7 +557,7 @@ function buildAggregateTreeFromFileList(layers: DiveLayer[]): FileTreeNode[] {
  * replaces a directory with a file or symlink.
  */
 export function pruneEntriesByTerminalPaths(
-  entriesByPath: Map<string, FileTreeNode>
+  entriesByPath: Map<string, FileTreeNode>,
 ): FileTreeNode[] {
   const entries = Array.from(entriesByPath.entries())
     .map(([path, entry]) => ({ path, entry }))
@@ -601,7 +574,7 @@ export function pruneEntriesByTerminalPaths(
       activeTerminalPrefix = undefined;
     }
     pruned.push(entry);
-    if (entry.fileType !== "directory") {
+    if (entry.fileType !== 'directory') {
       activeTerminalPrefix = path;
     }
   }
@@ -624,8 +597,7 @@ export function buildDiveFileTrees(dive: DiveResponse): NormalizedFileTree {
   const aggregate =
     normalized.aggregate.length > 0 ? normalized.aggregate : fileListTrees.aggregate;
 
-  const baseLayers =
-    normalized.layers.length > 0 ? normalized.layers : fileListTrees.layers;
+  const baseLayers = normalized.layers.length > 0 ? normalized.layers : fileListTrees.layers;
   const layers = baseLayers.map((layer, index) => {
     if (layer.tree.length > 0) {
       return layer;
@@ -643,22 +615,20 @@ export function buildDiveFileTrees(dive: DiveResponse): NormalizedFileTree {
   return { aggregate, layers };
 }
 
-export function buildWastedFileReferences(
-  nodes: FileTreeNode[]
-): FileReference[] {
+export function buildWastedFileReferences(nodes: FileTreeNode[]): FileReference[] {
   const entries = new Map<string, { count: number; sizeBytes: number }>();
   const visit = (node: FileTreeNode) => {
-    const isDirectory = node.fileType === "directory";
+    const isDirectory = node.fileType === 'directory';
     if (node.children && node.children.length > 0) {
       node.children.forEach(visit);
     }
     if (isDirectory) {
       return;
     }
-    if (node.change !== "removed" && node.change !== "modified") {
+    if (node.change !== 'removed' && node.change !== 'modified') {
       return;
     }
-    if (!node.path || typeof node.sizeBytes !== "number") {
+    if (!node.path || typeof node.sizeBytes !== 'number') {
       return;
     }
     const existing = entries.get(node.path);
@@ -687,7 +657,7 @@ function toMetricDelta(left?: number, right?: number): CompareMetricDelta {
 
 export function buildCompareSummaryDelta(
   left?: HistorySummary,
-  right?: HistorySummary
+  right?: HistorySummary,
 ): CompareSummaryDelta {
   return {
     sizeBytes: toMetricDelta(left?.sizeBytes, right?.sizeBytes),
@@ -703,12 +673,12 @@ function getLayerMatchKey(layer: DiveLayer): string {
   if (layer.id && layer.id.trim().length > 0) {
     return layer.id;
   }
-  return String(layer.index ?? "unknown");
+  return String(layer.index ?? 'unknown');
 }
 
 export function matchLayersForCompare(
   leftLayers: DiveLayer[] = [],
-  rightLayers: DiveLayer[] = []
+  rightLayers: DiveLayer[] = [],
 ): CompareLayerDelta[] {
   const leftMap = new Map<string, DiveLayer>();
   const rightMap = new Map<string, DiveLayer>();
@@ -731,18 +701,15 @@ export function matchLayersForCompare(
   return orderedKeys.map((key) => {
     const left = leftMap.get(key);
     const right = rightMap.get(key);
-    const leftSize = Number.isFinite(left?.sizeBytes) ? left?.sizeBytes ?? 0 : 0;
-    const rightSize = Number.isFinite(right?.sizeBytes) ? right?.sizeBytes ?? 0 : 0;
-    let status: CompareLayerDelta["status"] = "unchanged";
+    const leftSize = Number.isFinite(left?.sizeBytes) ? (left?.sizeBytes ?? 0) : 0;
+    const rightSize = Number.isFinite(right?.sizeBytes) ? (right?.sizeBytes ?? 0) : 0;
+    let status: CompareLayerDelta['status'] = 'unchanged';
     if (left && !right) {
-      status = "removed";
+      status = 'removed';
     } else if (!left && right) {
-      status = "added";
-    } else if (
-      left?.sizeBytes !== right?.sizeBytes ||
-      left?.command !== right?.command
-    ) {
-      status = "modified";
+      status = 'added';
+    } else if (left?.sizeBytes !== right?.sizeBytes || left?.command !== right?.command) {
+      status = 'modified';
     }
     return {
       key,

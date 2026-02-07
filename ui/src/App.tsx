@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createDockerDesktopClient } from "@docker/extension-api-client";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createDockerDesktopClient } from '@docker/extension-api-client';
 import {
   Typography,
   Card,
@@ -25,13 +25,13 @@ import {
   Tab,
   Tabs,
   TextField,
-} from "@mui/material";
+} from '@mui/material';
 
-import Analysis from "./analysis";
-import CompareView from "./compare";
-import CIGateDialog from "./cigatedialog";
-import ExportDialog from "./exportdialog";
-import HistoryList from "./history";
+import Analysis from './analysis';
+import CompareView from './compare';
+import CIGateDialog from './cigatedialog';
+import ExportDialog from './exportdialog';
+import HistoryList from './history';
 import {
   DOCKER_HUB_EXTENSION_URL,
   GITHUB_ISSUES_URL,
@@ -40,9 +40,9 @@ import {
   MEDIUM_URL,
   README_BADGES,
   TWITTER_URL,
-} from "./constants";
-import { extractId, formatBytes, formatRelativeTimeFromNow, getErrorMessage } from "./utils";
-import { formatJobStatusDisplay } from "./job-status";
+} from './constants';
+import { extractId, formatBytes, formatRelativeTimeFromNow, getErrorMessage } from './utils';
+import { formatJobStatusDisplay } from './job-status';
 import {
   AnalysisResult,
   AnalysisSource,
@@ -60,7 +60,7 @@ import {
   CompareSelectionState,
   CompareSide,
   JobStatus,
-} from "./models";
+} from './models';
 
 interface DockerImage {
   Labels: string[] | null;
@@ -90,9 +90,9 @@ const formatElapsed = (elapsedSeconds?: number) => {
 };
 
 const imageChipSx = {
-  height: "auto",
-  "& .MuiChip-label": {
-    fontSize: "0.8rem",
+  height: 'auto',
+  '& .MuiChip-label': {
+    fontSize: '0.8rem',
     lineHeight: 1.1,
     paddingInline: 2,
     paddingBlock: 1,
@@ -108,11 +108,7 @@ interface ImageCardProps {
   jobMessage?: string;
   jobElapsedSeconds?: number;
   openHistoryEntry: (id: string) => void;
-  startAnalysis: (
-    target: string,
-    selectedSource: AnalysisSource,
-    maybeImageId?: string
-  ) => void;
+  startAnalysis: (target: string, selectedSource: AnalysisSource, maybeImageId?: string) => void;
 }
 
 function ImageCard(props: ImageCardProps) {
@@ -123,9 +119,7 @@ function ImageCard(props: ImageCardProps) {
     ? formatRelativeTimeFromNow(props.image.createdAt)
     : undefined;
   const sizeLabel =
-    typeof props.image.sizeBytes === "number"
-      ? formatBytes(props.image.sizeBytes)
-      : undefined;
+    typeof props.image.sizeBytes === 'number' ? formatBytes(props.image.sizeBytes) : undefined;
   const aliases = props.image.aliases.filter((alias) => alias !== props.image.name);
   const elapsedLabel = formatElapsed(props.jobElapsedSeconds);
   const statusDisplay = props.jobStatus
@@ -139,20 +133,15 @@ function ImageCard(props: ImageCardProps) {
   return (
     <>
       <Card
-        sx={{ minWidth: 200, height: "100%", display: "flex", flexDirection: "column" }}
+        sx={{ minWidth: 200, height: '100%', display: 'flex', flexDirection: 'column' }}
         variant="outlined"
       >
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          sx={{ flex: 1 }}
-        >
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ flex: 1 }}>
           <CardContent sx={{ flex: 1, minWidth: 0 }}>
             <Typography
               variant="subtitle1"
               component="div"
-              sx={{ fontWeight: 500, overflowWrap: "anywhere" }}
+              sx={{ fontWeight: 500, overflowWrap: 'anywhere' }}
               gutterBottom
             >
               {props.image.name}
@@ -164,9 +153,9 @@ function ImageCard(props: ImageCardProps) {
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ display: "block", overflowWrap: "anywhere" }}
+                sx={{ display: 'block', overflowWrap: 'anywhere' }}
               >
-                Aliases: {aliases.join(", ")}
+                Aliases: {aliases.join(', ')}
               </Typography>
             ) : null}
             <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 1 }}>
@@ -181,39 +170,39 @@ function ImageCard(props: ImageCardProps) {
               ) : null}
             </Stack>
           </CardContent>
-          <CardActions sx={{ justifyContent: "flex-end", pr: 2, flexShrink: 0 }}>
+          <CardActions sx={{ justifyContent: 'flex-end', pr: 2, flexShrink: 0 }}>
             <Stack direction="column" spacing={1} alignItems="stretch">
               {props.historyEntry ? (
                 <Button
                   variant="contained"
                   color="primary"
                   disabled={props.isJobActive}
-                  onClick={() => props.openHistoryEntry(props.historyEntry?.id ?? "")}
+                  onClick={() => props.openHistoryEntry(props.historyEntry?.id ?? '')}
                   fullWidth
                 >
                   View analysis
                 </Button>
               ) : null}
-              <Box sx={{ position: "relative" }}>
+              <Box sx={{ position: 'relative' }}>
                 <Button
-                  variant={props.historyEntry ? "outlined" : "contained"}
+                  variant={props.historyEntry ? 'outlined' : 'contained'}
                   color="primary"
                   disabled={props.isJobActive}
                   onClick={() => {
-                    props.startAnalysis(props.image.name, "docker", props.image.fullId);
+                    props.startAnalysis(props.image.name, 'docker', props.image.fullId);
                   }}
                   fullWidth
                 >
-                  {props.historyEntry ? "Re-analyze" : "Analyze"}
+                  {props.historyEntry ? 'Re-analyze' : 'Analyze'}
                   {props.isJobActive && props.jobTarget === props.image.name && (
                     <CircularProgress
                       size={24}
                       sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        marginTop: "-12px",
-                        marginLeft: "-12px",
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        marginTop: '-12px',
+                        marginLeft: '-12px',
                       }}
                     />
                   )}
@@ -249,23 +238,19 @@ interface ImageListProps {
   jobMessage?: string;
   jobElapsedSeconds?: number;
   openHistoryEntry: (id: string) => void;
-  startAnalysis: (
-    target: string,
-    selectedSource: AnalysisSource,
-    maybeImageId?: string
-  ) => void;
+  startAnalysis: (target: string, selectedSource: AnalysisSource, maybeImageId?: string) => void;
   getImages: () => void;
 }
 
 function ImageList(props: ImageListProps) {
-  const [filter, setFilter] = useState("");
-  const [sortBy, setSortBy] = useState<"name" | "created" | "size">("created");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [filter, setFilter] = useState('');
+  const [sortBy, setSortBy] = useState<'name' | 'created' | 'size'>('created');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [isSingleColumn, setSingleColumn] = useState(true);
   const historyByImageRef = useMemo(() => {
     const map = new Map<string, HistoryMetadata>();
     props.historyEntries.forEach((entry) => {
-      if (entry.source !== "docker") {
+      if (entry.source !== 'docker') {
         return;
       }
       const key = entry.imageId || entry.image;
@@ -291,19 +276,17 @@ function ImageList(props: ImageListProps) {
       if (image.name.toLowerCase().includes(trimmed)) {
         return true;
       }
-      return image.aliases.some((alias) =>
-        alias.toLowerCase().includes(trimmed)
-      );
+      return image.aliases.some((alias) => alias.toLowerCase().includes(trimmed));
     });
   }, [filter, props.images]);
   const sortedImages = useMemo(() => {
     const copy = [...filteredImages];
-    const direction = sortDirection === "asc" ? 1 : -1;
+    const direction = sortDirection === 'asc' ? 1 : -1;
     copy.sort((left, right) => {
-      if (sortBy === "name") {
+      if (sortBy === 'name') {
         return left.name.localeCompare(right.name) * direction;
       }
-      if (sortBy === "created") {
+      if (sortBy === 'created') {
         const leftValue = left.createdAt ?? 0;
         const rightValue = right.createdAt ?? 0;
         return (leftValue - rightValue) * direction;
@@ -320,13 +303,7 @@ function ImageList(props: ImageListProps) {
       <Typography variant="h3" sx={{ mb: 2 }}>
         Choose an image below to get started
       </Typography>
-      <Stack
-        direction="row"
-        spacing={2}
-        flexWrap="wrap"
-        alignItems="center"
-        sx={{ mb: 2 }}
-      >
+      <Stack direction="row" spacing={2} flexWrap="wrap" alignItems="center" sx={{ mb: 2 }}>
         <TextField
           label="Filter by image name"
           value={filter}
@@ -339,9 +316,7 @@ function ImageList(props: ImageListProps) {
           select
           label="Sort by"
           value={sortBy}
-          onChange={(event) =>
-            setSortBy(event.target.value as "name" | "created" | "size")
-          }
+          onChange={(event) => setSortBy(event.target.value as 'name' | 'created' | 'size')}
           size="small"
           sx={{ minWidth: 160 }}
           disabled={props.isJobActive}
@@ -354,9 +329,7 @@ function ImageList(props: ImageListProps) {
           select
           label="Direction"
           value={sortDirection}
-          onChange={(event) =>
-            setSortDirection(event.target.value as "asc" | "desc")
-          }
+          onChange={(event) => setSortDirection(event.target.value as 'asc' | 'desc')}
           size="small"
           sx={{ minWidth: 140 }}
           disabled={props.isJobActive}
@@ -364,11 +337,7 @@ function ImageList(props: ImageListProps) {
           <MenuItem value="asc">Ascending</MenuItem>
           <MenuItem value="desc">Descending</MenuItem>
         </TextField>
-        <Button
-          variant="outlined"
-          onClick={props.getImages}
-          disabled={props.isJobActive}
-        >
+        <Button variant="outlined" onClick={props.getImages} disabled={props.isJobActive}>
           Refresh list
         </Button>
         <FormControlLabel
@@ -394,16 +363,9 @@ function ImageList(props: ImageListProps) {
         <Box sx={{ mx: isSingleColumn ? { xs: 0, md: 6 } : 0 }}>
           <Grid container spacing={2} alignItems="stretch">
             {sortedImages.map((image) => {
-              const historyEntry = image.fullId
-                ? historyByImageRef.get(image.fullId)
-                : undefined;
+              const historyEntry = image.fullId ? historyByImageRef.get(image.fullId) : undefined;
               return (
-                <Grid
-                  item
-                  xs={12}
-                  md={isSingleColumn ? 12 : 6}
-                  key={`${image.id}-${image.name}`}
-                >
+                <Grid item xs={12} md={isSingleColumn ? 12 : 6} key={`${image.id}-${image.name}`}>
                   <ImageCard
                     image={image}
                     historyEntry={historyEntry}
@@ -426,38 +388,27 @@ function ImageList(props: ImageListProps) {
 }
 
 export function App() {
-  const [analysis, setAnalysisResult] = useState<AnalysisResult | undefined>(
-    undefined
-  );
-  const [activeTab, setActiveTab] = useState<"analysis" | "history">("analysis");
+  const [analysis, setAnalysisResult] = useState<AnalysisResult | undefined>(undefined);
+  const [activeTab, setActiveTab] = useState<'analysis' | 'history'>('analysis');
   const [isCheckingDive, setCheckingDive] = useState<boolean>(false);
   const [images, setImages] = useState<Image[]>([]);
   const [isDiveInstalled, setDiveInstalled] = useState<boolean>(false);
-  const [clientError, setClientError] = useState<string | undefined>(
-    undefined
-  );
-  const [source, setSource] = useState<AnalysisSource>("docker");
-  const [archivePath, setArchivePath] = useState<string>("");
+  const [clientError, setClientError] = useState<string | undefined>(undefined);
+  const [source, setSource] = useState<AnalysisSource>('docker');
+  const [archivePath, setArchivePath] = useState<string>('');
   const [jobId, setJobId] = useState<string | undefined>(undefined);
   const [jobStatus, setJobStatus] = useState<JobStatus | undefined>(undefined);
   const [jobMessage, setJobMessage] = useState<string | undefined>(undefined);
   const [jobTarget, setJobTarget] = useState<string | undefined>(undefined);
-  const [jobElapsedSeconds, setJobElapsedSeconds] = useState<number | undefined>(
-    undefined
-  );
+  const [jobElapsedSeconds, setJobElapsedSeconds] = useState<number | undefined>(undefined);
   const [historyEntries, setHistoryEntries] = useState<HistoryMetadata[]>([]);
-  const [historyError, setHistoryError] = useState<string | undefined>(
-    undefined
-  );
+  const [historyError, setHistoryError] = useState<string | undefined>(undefined);
   const [isHistoryLoading, setHistoryLoading] = useState(false);
-  const [selectedHistoryId, setSelectedHistoryId] = useState<
-    string | undefined
-  >(undefined);
-  const [compareSelection, setCompareSelection] =
-    useState<CompareSelectionState>({});
-  const [compareIds, setCompareIds] = useState<
-    { leftId: string; rightId: string } | undefined
-  >(undefined);
+  const [selectedHistoryId, setSelectedHistoryId] = useState<string | undefined>(undefined);
+  const [compareSelection, setCompareSelection] = useState<CompareSelectionState>({});
+  const [compareIds, setCompareIds] = useState<{ leftId: string; rightId: string } | undefined>(
+    undefined,
+  );
   const [isExportDialogOpen, setExportDialogOpen] = useState(false);
   const [isCIGateDialogOpen, setCIGateDialogOpen] = useState(false);
   const listScrollYRef = useRef(0);
@@ -477,7 +428,7 @@ export function App() {
     }
     setCheckingDive(true);
     try {
-      await ddClient.extension.vm.service.get("/checkdive");
+      await ddClient.extension.vm.service.get('/checkdive');
       setDiveInstalled(true);
       setClientError(undefined);
     } catch (error) {
@@ -488,7 +439,7 @@ export function App() {
     }
   }, [ddClient]);
 
-  const isDiveMissing = clientError?.includes("Dive is not found");
+  const isDiveMissing = clientError?.includes('Dive is not found');
 
   const readImages = useCallback(async () => {
     if (!ddClient) {
@@ -504,7 +455,7 @@ export function App() {
     const all = await readImages();
     const byImageId = new Map<string, Image>();
     const parseCreatedAt = (image: DockerImage) => {
-      if (typeof image.Created === "number" && Number.isFinite(image.Created)) {
+      if (typeof image.Created === 'number' && Number.isFinite(image.Created)) {
         return image.Created * 1000;
       }
       if (image.CreatedAt) {
@@ -517,10 +468,9 @@ export function App() {
     };
     all.forEach((i) => {
       const createdAt = parseCreatedAt(i);
-      const sizeBytes = typeof i.Size === "number" ? i.Size : undefined;
-      const tags = i.RepoTags?.filter((tag) => tag !== "<none>:<none>") ?? [];
-      const digests =
-        i.RepoDigests?.filter((digest) => digest !== "<none>@<none>") ?? [];
+      const sizeBytes = typeof i.Size === 'number' ? i.Size : undefined;
+      const tags = i.RepoTags?.filter((tag) => tag !== '<none>:<none>') ?? [];
+      const digests = i.RepoDigests?.filter((digest) => digest !== '<none>@<none>') ?? [];
       const aliases = [...tags, ...digests];
       if (aliases.length === 0) {
         return;
@@ -529,13 +479,9 @@ export function App() {
       const nextAliases = new Set([...(existing?.aliases ?? []), ...aliases]);
       const preferTag =
         tags.length > 0 &&
-        (!existing ||
-          existing.name.startsWith("sha256:") ||
-          existing.name.includes("@sha256:"));
+        (!existing || existing.name.startsWith('sha256:') || existing.name.includes('@sha256:'));
       const primaryName =
-        preferTag && tags.length > 0
-          ? tags[0]
-          : existing?.name ?? aliases[0] ?? extractId(i.Id);
+        preferTag && tags.length > 0 ? tags[0] : (existing?.name ?? aliases[0] ?? extractId(i.Id));
       const nextImage: Image = {
         name: primaryName,
         id: extractId(i.Id),
@@ -555,9 +501,7 @@ export function App() {
     }
     setHistoryLoading(true);
     try {
-      const data = (await ddClient.extension.vm.service.get(
-        "/history"
-      )) as HistoryMetadata[];
+      const data = (await ddClient.extension.vm.service.get('/history')) as HistoryMetadata[];
       setHistoryEntries(data);
       setHistoryError(undefined);
     } catch (error) {
@@ -573,10 +517,10 @@ export function App() {
     }
     setCompareSelection((prev) => {
       const next = { ...prev };
-      if (ids.includes(prev.leftId ?? "")) {
+      if (ids.includes(prev.leftId ?? '')) {
         delete next.leftId;
       }
-      if (ids.includes(prev.rightId ?? "")) {
+      if (ids.includes(prev.rightId ?? '')) {
         delete next.rightId;
       }
       return next;
@@ -591,12 +535,10 @@ export function App() {
 
   const deleteHistoryEntry = async (id: string) => {
     if (!ddClient?.extension?.vm?.service) {
-      setHistoryError("Backend API is unavailable.");
+      setHistoryError('Backend API is unavailable.');
       return;
     }
-    const confirmed = window.confirm(
-      "Delete this history entry from this machine?"
-    );
+    const confirmed = window.confirm('Delete this history entry from this machine?');
     if (!confirmed) {
       return;
     }
@@ -615,18 +557,16 @@ export function App() {
 
   const deleteAllHistory = async () => {
     if (!ddClient?.extension?.vm?.service) {
-      setHistoryError("Backend API is unavailable.");
+      setHistoryError('Backend API is unavailable.');
       return;
     }
-    const confirmed = window.confirm(
-      "Delete all history entries from this machine?"
-    );
+    const confirmed = window.confirm('Delete all history entries from this machine?');
     if (!confirmed) {
       return;
     }
     setHistoryLoading(true);
     try {
-      await ddClient.extension.vm.service.delete("/history");
+      await ddClient.extension.vm.service.delete('/history');
       clearHistorySelections(historyEntries.map((entry) => entry.id));
       setHistoryEntries([]);
       setHistoryError(undefined);
@@ -639,16 +579,14 @@ export function App() {
 
   const openHistoryEntry = async (id: string) => {
     if (!ddClient?.extension?.vm?.service) {
-      setHistoryError("Backend API is unavailable.");
+      setHistoryError('Backend API is unavailable.');
       return;
     }
     try {
       saveListScrollPosition();
       scrollToTop();
-      setActiveTab("analysis");
-      const entry = (await ddClient.extension.vm.service.get(
-        `/history/${id}`
-      )) as HistoryEntry;
+      setActiveTab('analysis');
+      const entry = (await ddClient.extension.vm.service.get(`/history/${id}`)) as HistoryEntry;
       setCompareIds(undefined);
       setAnalysisResult({
         image: {
@@ -678,13 +616,13 @@ export function App() {
   };
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   };
 
   const downloadFile = (data: BlobPart, filename: string, contentType: string) => {
     const blob = new Blob([data], { type: contentType });
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
     link.download = filename;
     link.click();
@@ -692,7 +630,7 @@ export function App() {
   };
 
   const normalizeExportData = (data: unknown): BlobPart => {
-    if (typeof data === "string") {
+    if (typeof data === 'string') {
       return data;
     }
     if (data instanceof Uint8Array) {
@@ -706,107 +644,100 @@ export function App() {
 
   const handleExport = async (format: ExportFormat) => {
     if (!ddClient?.extension?.vm?.service) {
-      throw new Error("Backend API is unavailable.");
+      throw new Error('Backend API is unavailable.');
     }
     if (!selectedHistoryId) {
-      throw new Error("Select an analysis entry to export.");
+      throw new Error('Select an analysis entry to export.');
     }
     const response = (await ddClient.extension.vm.service.post(
       `/history/${selectedHistoryId}/export`,
-      { format }
+      { format },
     )) as ExportResponse;
     const exported = await ddClient.extension.vm.service.get(
-      `/history/${selectedHistoryId}/export/${format}`
+      `/history/${selectedHistoryId}/export/${format}`,
     );
-    downloadFile(
-      normalizeExportData(exported),
-      response.filename,
-      response.contentType
-    );
+    downloadFile(normalizeExportData(exported), response.filename, response.contentType);
   };
 
-  const handleGenerateCIRules = async (
-    payload: CIRulesRequest
-  ): Promise<CIRulesResponse> => {
+  const handleGenerateCIRules = async (payload: CIRulesRequest): Promise<CIRulesResponse> => {
     if (!ddClient?.extension?.vm?.service) {
-      throw new Error("Backend API is unavailable.");
+      throw new Error('Backend API is unavailable.');
     }
-    return (await ddClient.extension.vm.service.post(
-      "/ci/rules",
-      payload
-    )) as CIRulesResponse;
+    return (await ddClient.extension.vm.service.post('/ci/rules', payload)) as CIRulesResponse;
   };
 
   const handleDownloadCIRules = (content: string, filename: string) => {
-    downloadFile(content, filename, "application/x-yaml");
+    downloadFile(content, filename, 'application/x-yaml');
   };
 
-  const fetchAnalysisResult = useCallback(async (currentJobId: string) => {
-    if (!ddClient?.extension?.vm?.service) {
-      return;
-    }
-    try {
-      const dive = (await ddClient.extension.vm.service.get(
-        `/analysis/${currentJobId}/result`
-      )) as DiveResponse;
-      saveListScrollPosition();
-      scrollToTop();
-      setAnalysisResult({
-        image: {
-          name: jobTarget ?? "Unknown image",
-          id: currentJobId,
-          aliases: [],
-        },
-        dive,
-      });
-      setSelectedHistoryId(currentJobId);
-      setActiveTab("analysis");
-      await fetchHistory();
-    } catch (error) {
-      setJobStatus("failed");
-      setJobMessage(getErrorMessage(error));
-    }
-  }, [ddClient, fetchHistory, jobTarget]);
+  const fetchAnalysisResult = useCallback(
+    async (currentJobId: string) => {
+      if (!ddClient?.extension?.vm?.service) {
+        return;
+      }
+      try {
+        const dive = (await ddClient.extension.vm.service.get(
+          `/analysis/${currentJobId}/result`,
+        )) as DiveResponse;
+        saveListScrollPosition();
+        scrollToTop();
+        setAnalysisResult({
+          image: {
+            name: jobTarget ?? 'Unknown image',
+            id: currentJobId,
+            aliases: [],
+          },
+          dive,
+        });
+        setSelectedHistoryId(currentJobId);
+        setActiveTab('analysis');
+        await fetchHistory();
+      } catch (error) {
+        setJobStatus('failed');
+        setJobMessage(getErrorMessage(error));
+      }
+    },
+    [ddClient, fetchHistory, jobTarget],
+  );
 
-  const startAnalysis = useCallback(async (
-    target: string,
-    selectedSource: AnalysisSource,
-    maybeImageId?: string
-  ) => {
-    if (!ddClient?.extension?.vm?.service) {
-      setJobStatus("failed");
-      setJobMessage("Backend API is unavailable.");
-      return;
-    }
+  const startAnalysis = useCallback(
+    async (target: string, selectedSource: AnalysisSource, maybeImageId?: string) => {
+      if (!ddClient?.extension?.vm?.service) {
+        setJobStatus('failed');
+        setJobMessage('Backend API is unavailable.');
+        return;
+      }
 
-    const payload: AnalyzeRequest =
-      selectedSource === "docker-archive"
-        ? { source: selectedSource, archivePath: target }
-        : {
-            source: selectedSource,
-            image: target,
-            imageId: maybeImageId,
-          };
+      const payload: AnalyzeRequest =
+        selectedSource === 'docker-archive'
+          ? { source: selectedSource, archivePath: target }
+          : {
+              source: selectedSource,
+              image: target,
+              imageId: maybeImageId,
+            };
 
-    setJobMessage(undefined);
-    setAnalysisResult(undefined);
-    setSelectedHistoryId(undefined);
-    setJobTarget(target);
-    setJobStatus("queued");
-    setJobElapsedSeconds(0);
+      setJobMessage(undefined);
+      setAnalysisResult(undefined);
+      setSelectedHistoryId(undefined);
+      setJobTarget(target);
+      setJobStatus('queued');
+      setJobElapsedSeconds(0);
 
-    try {
-      const data = (await ddClient.extension.vm.service.post(
-        "/analyze",
-        payload
-      )) as AnalyzeResponse;
-      setJobId(data.jobId);
-      setJobStatus(data.status);
-    } catch (error) {
-      setJobStatus("failed");
-      setJobMessage(getErrorMessage(error));
-    }
-  }, [ddClient]);
+      try {
+        const data = (await ddClient.extension.vm.service.post(
+          '/analyze',
+          payload,
+        )) as AnalyzeResponse;
+        setJobId(data.jobId);
+        setJobStatus(data.status);
+      } catch (error) {
+        setJobStatus('failed');
+        setJobMessage(getErrorMessage(error));
+      }
+    },
+    [ddClient],
+  );
 
   const ArchiveAnalyzer = () => {
     const archiveTarget = archivePath.trim();
@@ -829,22 +760,22 @@ export function App() {
           onChange={(event) => setArchivePath(event.target.value)}
           fullWidth
         />
-        <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: 'relative' }}>
           <Button
             variant="outlined"
-            disabled={isJobActive || archiveTarget === ""}
-            onClick={() => startAnalysis(archiveTarget, "docker-archive")}
+            disabled={isJobActive || archiveTarget === ''}
+            onClick={() => startAnalysis(archiveTarget, 'docker-archive')}
           >
             Analyze archive
             {isJobActive && jobTarget === archiveTarget && (
               <CircularProgress
                 size={24}
                 sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  marginTop: "-12px",
-                  marginLeft: "-12px",
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px',
                 }}
               />
             )}
@@ -872,7 +803,7 @@ export function App() {
       return;
     }
     if (!ddClient.extension?.vm?.service) {
-      setClientError("Backend service is unavailable.");
+      setClientError('Backend service is unavailable.');
       return;
     }
     checkDiveInstallation();
@@ -884,7 +815,7 @@ export function App() {
     if (!ddClient?.extension?.vm?.service || !jobId) {
       return;
     }
-    if (jobStatus !== "queued" && jobStatus !== "running") {
+    if (jobStatus !== 'queued' && jobStatus !== 'running') {
       return;
     }
 
@@ -893,11 +824,11 @@ export function App() {
       let status: AnalysisStatusResponse;
       try {
         status = (await ddClient.extension.vm.service.get(
-          `/analysis/${jobId}/status`
+          `/analysis/${jobId}/status`,
         )) as AnalysisStatusResponse;
       } catch (error) {
         if (!isCancelled) {
-          setJobStatus("failed");
+          setJobStatus('failed');
           setJobMessage(getErrorMessage(error));
         }
         return;
@@ -909,7 +840,7 @@ export function App() {
       setJobMessage(status.message);
       setJobElapsedSeconds(status.elapsedSeconds);
 
-      if (status.status === "succeeded") {
+      if (status.status === 'succeeded') {
         await fetchAnalysisResult(jobId);
       }
     };
@@ -928,14 +859,14 @@ export function App() {
     resetJobState();
     setSelectedHistoryId(undefined);
     requestAnimationFrame(() => {
-      window.scrollTo({ top: listScrollYRef.current, left: 0, behavior: "auto" });
+      window.scrollTo({ top: listScrollYRef.current, left: 0, behavior: 'auto' });
     });
   };
 
   const updateCompareSelection = (side: CompareSide, id: string) => {
     setCompareSelection((prev) => {
       const next = { ...prev };
-      if (side === "left") {
+      if (side === 'left') {
         next.leftId = id;
         if (prev.rightId === id) {
           next.rightId = undefined;
@@ -953,7 +884,7 @@ export function App() {
   const clearCompareSelection = (side: CompareSide) => {
     setCompareSelection((prev) => ({
       ...prev,
-      [side === "left" ? "leftId" : "rightId"]: undefined,
+      [side === 'left' ? 'leftId' : 'rightId']: undefined,
     }));
   };
 
@@ -964,10 +895,10 @@ export function App() {
     resetJobState();
     setSelectedHistoryId(undefined);
     setCompareIds({ leftId, rightId });
-    setActiveTab("analysis");
+    setActiveTab('analysis');
   };
 
-  const isJobActive = jobStatus === "queued" || jobStatus === "running";
+  const isJobActive = jobStatus === 'queued' || jobStatus === 'running';
   const tabsEnabled = !!ddClient && isDiveInstalled && !isCheckingDive;
 
   const errorHint = (() => {
@@ -975,14 +906,14 @@ export function App() {
       return undefined;
     }
     const lowered = jobMessage.toLowerCase();
-    if (lowered.includes("timed out")) {
-      return "Try a smaller image or rerun when the engine is less busy.";
+    if (lowered.includes('timed out')) {
+      return 'Try a smaller image or rerun when the engine is less busy.';
     }
-    if (lowered.includes("binary not found")) {
-      return "Install the Dive CLI in the backend VM, then retry.";
+    if (lowered.includes('binary not found')) {
+      return 'Install the Dive CLI in the backend VM, then retry.';
     }
-    if (lowered.includes("archive")) {
-      return "Double-check the archive path and ensure the file exists.";
+    if (lowered.includes('archive')) {
+      return 'Double-check the archive path and ensure the file exists.';
     }
     return undefined;
   })();
@@ -994,7 +925,7 @@ export function App() {
   };
 
   const failedStatusDisplay =
-    jobStatus === "failed"
+    jobStatus === 'failed'
       ? formatJobStatusDisplay({
           jobStatus,
           jobMessage,
@@ -1013,29 +944,24 @@ export function App() {
         })
       : undefined;
 
-  const statusAlert =
-    failedStatusDisplay ? (
-      <Alert
-        severity="error"
-        action={
-          <Button color="inherit" size="small" onClick={handleRetry}>
-            Retry
-          </Button>
-        }
-      >
-        <Stack spacing={0.5}>
-          <Typography variant="body2">{failedStatusDisplay.statusLine}</Typography>
-          {failedStatusDisplay.detailMessage ? (
-            <Typography variant="body2">
-              {failedStatusDisplay.detailMessage}
-            </Typography>
-          ) : null}
-          {errorHint ? (
-            <Typography variant="body2">{errorHint}</Typography>
-          ) : null}
-        </Stack>
-      </Alert>
-    ) : null;
+  const statusAlert = failedStatusDisplay ? (
+    <Alert
+      severity="error"
+      action={
+        <Button color="inherit" size="small" onClick={handleRetry}>
+          Retry
+        </Button>
+      }
+    >
+      <Stack spacing={0.5}>
+        <Typography variant="body2">{failedStatusDisplay.statusLine}</Typography>
+        {failedStatusDisplay.detailMessage ? (
+          <Typography variant="body2">{failedStatusDisplay.detailMessage}</Typography>
+        ) : null}
+        {errorHint ? <Typography variant="body2">{errorHint}</Typography> : null}
+      </Stack>
+    </Alert>
+  ) : null;
 
   return (
     <>
@@ -1052,20 +978,17 @@ export function App() {
           onChange={(_, value) => setActiveTab(value)}
           aria-label="Analysis and history tabs"
           sx={{
-            "& .MuiTab-root": {
-              fontSize: "2rem",
+            '& .MuiTab-root': {
+              fontSize: '2rem',
               fontWeight: 500,
-              textTransform: "none",
+              textTransform: 'none',
             },
           }}
         >
           <Tab label="Analysis" value="analysis" disabled={!tabsEnabled} />
           <Tab label="History" value="history" disabled={!tabsEnabled} />
         </Tabs>
-        <Typography
-          variant="h1"
-          sx={{ display: "flex", alignItems: "center", gap: 2, ml: "auto" }}
-        >
+        <Typography variant="h1" sx={{ display: 'flex', alignItems: 'center', gap: 2, ml: 'auto' }}>
           <Box
             component="img"
             src="scuba.svg"
@@ -1096,16 +1019,14 @@ export function App() {
       {!ddClient ? (
         <Stack spacing={2}>
           <Alert severity="error">
-            This UI must be run inside Docker Desktop. The extension API client
-            is unavailable in a regular browser.
+            This UI must be run inside Docker Desktop. The extension API client is unavailable in a
+            regular browser.
           </Alert>
           <Alert severity="info">
-            Load the extension in Docker Desktop, then re-open this tab. See
-            README for local dev steps.
+            Load the extension in Docker Desktop, then re-open this tab. See README for local dev
+            steps.
           </Alert>
-          {clientError ? (
-            <Alert severity="warning">Details: {clientError}</Alert>
-          ) : null}
+          {clientError ? <Alert severity="warning">Details: {clientError}</Alert> : null}
         </Stack>
       ) : null}
       {isCheckingDive ? (
@@ -1122,22 +1043,27 @@ export function App() {
           </Alert>
           {isDiveMissing ? (
             <Alert severity="info">
-              Install Dive in the backend VM image, rebuild the extension, and
-              reinstall it in Docker Desktop. Basic install options:
+              Install Dive in the backend VM image, rebuild the extension, and reinstall it in
+              Docker Desktop. Basic install options:
               <Box component="ul" sx={{ pl: 2, mt: 1, mb: 0 }}>
-                <li>macOS (Homebrew): <code>brew install dive</code></li>
                 <li>
-                  Ubuntu/Debian: download the latest <code>.deb</code> and run{" "}
+                  macOS (Homebrew): <code>brew install dive</code>
+                </li>
+                <li>
+                  Ubuntu/Debian: download the latest <code>.deb</code> and run{' '}
                   <code>sudo apt install ./dive_&lt;version&gt;_linux_amd64.deb</code>
                 </li>
                 <li>
-                  RHEL/CentOS: download the latest <code>.rpm</code> and run{" "}
+                  RHEL/CentOS: download the latest <code>.rpm</code> and run{' '}
                   <code>rpm -i dive_&lt;version&gt;_linux_amd64.rpm</code>
                 </li>
               </Box>
-              For more options (Windows, Arch, Nix, Docker), see the Dive install
-              docs (fork of{" "}
-              <Link href="https://github.com/wagoodman/dive" target="_blank" rel="noopener noreferrer">
+              For more options (Windows, Arch, Nix, Docker), see the Dive install docs (fork of{' '}
+              <Link
+                href="https://github.com/wagoodman/dive"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 wagoodman/dive
               </Link>
               ).
@@ -1146,9 +1072,7 @@ export function App() {
                   size="small"
                   variant="outlined"
                   onClick={() =>
-                    ddClient?.host.openExternal(
-                      "https://github.com/pRizz/dive#installation"
-                    )
+                    ddClient?.host.openExternal('https://github.com/pRizz/dive#installation')
                   }
                 >
                   Open Dive install docs
@@ -1156,16 +1080,14 @@ export function App() {
               </Box>
             </Alert>
           ) : null}
-          {clientError ? (
-            <Alert severity="info">Details: {clientError}</Alert>
-          ) : null}
+          {clientError ? <Alert severity="info">Details: {clientError}</Alert> : null}
           <Button variant="outlined" onClick={() => checkDiveInstallation()}>
             Retry check
           </Button>
         </Stack>
       ) : (
         <>
-          <Box role="tabpanel" hidden={activeTab !== "analysis"} sx={{ mt: 3 }}>
+          <Box role="tabpanel" hidden={activeTab !== 'analysis'} sx={{ mt: 3 }}>
             {analysis ? (
               <Stack spacing={2}>
                 {completedStatusDisplay ? (
@@ -1191,22 +1113,14 @@ export function App() {
             ) : (
               <Stack spacing={3}>
                 <FormControl disabled={isJobActive}>
-                  <FormLabel id="analysis-source-label">
-                    Analysis source
-                  </FormLabel>
+                  <FormLabel id="analysis-source-label">Analysis source</FormLabel>
                   <RadioGroup
                     row
                     aria-labelledby="analysis-source-label"
                     value={source}
-                    onChange={(event) =>
-                      setSource(event.target.value as AnalysisSource)
-                    }
+                    onChange={(event) => setSource(event.target.value as AnalysisSource)}
                   >
-                    <FormControlLabel
-                      value="docker"
-                      control={<Radio />}
-                      label="Docker engine"
-                    />
+                    <FormControlLabel value="docker" control={<Radio />} label="Docker engine" />
                     <FormControlLabel
                       value="docker-archive"
                       control={<Radio />}
@@ -1214,7 +1128,7 @@ export function App() {
                     />
                   </RadioGroup>
                 </FormControl>
-                {source === "docker" ? (
+                {source === 'docker' ? (
                   <ImageList
                     images={images}
                     historyEntries={historyEntries}
@@ -1233,7 +1147,7 @@ export function App() {
               </Stack>
             )}
           </Box>
-          <Box role="tabpanel" hidden={activeTab !== "history"} sx={{ mt: 3 }}>
+          <Box role="tabpanel" hidden={activeTab !== 'history'} sx={{ mt: 3 }}>
             <HistoryList
               entries={historyEntries}
               isLoading={isHistoryLoading}
@@ -1251,58 +1165,54 @@ export function App() {
         </>
       )}
       <Divider sx={{ mt: 6, mb: 3 }} />
-      <Stack spacing={1} sx={{ textAlign: "center", pb: 4 }}>
+      <Stack spacing={1} sx={{ textAlign: 'center', pb: 4 }}>
         <Typography variant="body2" color="text.secondary">
-          All analysis runs locally in Docker Desktop.{" "}
+          All analysis runs locally in Docker Desktop.{' '}
           <Typography component="span" color="text.primary">
             Your images never leave your machine.
           </Typography>
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Built on top of the Dive CLI:{" "}
-          <Link
-            href="https://github.com/pRizz/dive"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          Built on top of the Dive CLI:{' '}
+          <Link href="https://github.com/pRizz/dive" target="_blank" rel="noopener noreferrer">
             pRizz/dive
           </Link>
           <Typography
             component="span"
             aria-hidden="true"
-            sx={{ mx: 0.75, fontSize: "1rem", color: "text.disabled" }}
+            sx={{ mx: 0.75, fontSize: '1rem', color: 'text.disabled' }}
           >
             ·
           </Typography>
           <Link href="https://github.com/wagoodman/dive" target="_blank" rel="noopener noreferrer">
             wagoodman/dive
-          </Link>
-          {" "}(upstream).
+          </Link>{' '}
+          (upstream).
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          Made by{" "}
+          Made by{' '}
           <Typography component="span" color="text.primary">
             Peter Ryszkiewicz
-          </Typography>
-          {" "}forked from{" "}
-          <Link href="https://github.com/prakhar1989/dive-in" target="_blank" rel="noopener noreferrer">
+          </Typography>{' '}
+          forked from{' '}
+          <Link
+            href="https://github.com/prakhar1989/dive-in"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Prakhar Srivastav&apos;s work
           </Link>
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          Enjoying Deep Dive?{" "}
-          <Link
-            href={DOCKER_HUB_EXTENSION_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          Enjoying Deep Dive?{' '}
+          <Link href={DOCKER_HUB_EXTENSION_URL} target="_blank" rel="noopener noreferrer">
             Like it on Docker Hub
-          </Link>{" "}
-          or{" "}
+          </Link>{' '}
+          or{' '}
           <Link href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
             star it on GitHub
           </Link>
-          , or share feedback in{" "}
+          , or share feedback in{' '}
           <Link href={GITHUB_ISSUES_URL} target="_blank" rel="noopener noreferrer">
             Issues
           </Link>
@@ -1328,7 +1238,7 @@ export function App() {
                 component="img"
                 src={badge.imageUrl}
                 alt={badge.label}
-                sx={{ display: "block", height: 20, width: "auto" }}
+                sx={{ display: 'block', height: 20, width: 'auto' }}
               />
             </Link>
           ))}

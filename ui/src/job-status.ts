@@ -1,4 +1,4 @@
-import { JobStatus } from "./models";
+import { JobStatus } from './models';
 
 export interface FormatJobStatusOptions {
   jobStatus: JobStatus | string;
@@ -15,10 +15,10 @@ export interface JobStatusDisplay {
 }
 
 const FRIENDLY_STATUS_LABELS: Record<JobStatus, string> = {
-  queued: "Queued for analysis",
-  running: "Analyzing image",
-  succeeded: "Analysis complete",
-  failed: "Analysis failed",
+  queued: 'Queued for analysis',
+  running: 'Analyzing image',
+  succeeded: 'Analysis complete',
+  failed: 'Analysis failed',
 };
 
 function isKnownJobStatus(status: string): status is JobStatus {
@@ -30,32 +30,26 @@ function toTitleCase(value: string): string {
     .split(/[\s_-]+/)
     .filter(Boolean)
     .map((token) => token.charAt(0).toUpperCase() + token.slice(1))
-    .join(" ");
+    .join(' ');
 }
 
 function isRedundantRunningMessage(message: string): boolean {
   const normalized = message.trim().toLowerCase();
-  return normalized === "analyzing image" || normalized === "analysis running";
+  return normalized === 'analyzing image' || normalized === 'analysis running';
 }
 
-export function formatJobStatusDisplay(
-  options: FormatJobStatusOptions
-): JobStatusDisplay {
+export function formatJobStatusDisplay(options: FormatJobStatusOptions): JobStatusDisplay {
   const rawStatus = options.jobStatus.trim().toLowerCase();
   const knownStatus = isKnownJobStatus(rawStatus) ? rawStatus : undefined;
-  const isActive = rawStatus === "queued" || rawStatus === "running";
-  const isFailure = rawStatus === "failed";
+  const isActive = rawStatus === 'queued' || rawStatus === 'running';
+  const isFailure = rawStatus === 'failed';
   const message = options.jobMessage?.trim();
 
   let baseLabel = knownStatus
     ? FRIENDLY_STATUS_LABELS[knownStatus]
-    : toTitleCase(rawStatus || "unknown");
+    : toTitleCase(rawStatus || 'unknown');
 
-  if (
-    rawStatus === "running" &&
-    message &&
-    !isRedundantRunningMessage(message)
-  ) {
+  if (rawStatus === 'running' && message && !isRedundantRunningMessage(message)) {
     baseLabel = `${baseLabel} — ${message}`;
   }
 

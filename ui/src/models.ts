@@ -22,14 +22,9 @@ export interface FileReference {
   file: string;
 }
 
-export type FileChangeType =
-  | "added"
-  | "modified"
-  | "removed"
-  | "unchanged"
-  | "unknown";
+export type FileChangeType = 'added' | 'modified' | 'removed' | 'unchanged' | 'unknown';
 
-export type FileNodeType = "file" | "directory" | "link" | "unknown";
+export type FileNodeType = 'file' | 'directory' | 'link' | 'unknown';
 
 export interface FileTreeNode {
   name: string;
@@ -89,9 +84,9 @@ export interface Image {
   aliases: string[];
 }
 
-export type AnalysisSource = "docker" | "docker-archive";
+export type AnalysisSource = 'docker' | 'docker-archive';
 
-export type JobStatus = "queued" | "running" | "succeeded" | "failed";
+export type JobStatus = 'queued' | 'running' | 'succeeded' | 'failed';
 
 export interface AnalyzeRequest {
   image?: string;
@@ -138,7 +133,7 @@ export interface HistoryEntry {
   result: DiveResponse;
 }
 
-export type CompareSide = "left" | "right";
+export type CompareSide = 'left' | 'right';
 
 export interface CompareSelectionState {
   leftId?: string;
@@ -157,7 +152,7 @@ export interface CompareSummaryDelta {
   efficiencyScore: CompareMetricDelta;
 }
 
-export type CompareLayerStatus = "added" | "removed" | "modified" | "unchanged";
+export type CompareLayerStatus = 'added' | 'removed' | 'modified' | 'unchanged';
 
 export interface CompareLayerDelta {
   key: string;
@@ -167,7 +162,7 @@ export interface CompareLayerDelta {
   sizeBytesDelta: number;
 }
 
-export type ExportFormat = "json" | "csv" | "html";
+export type ExportFormat = 'json' | 'csv' | 'html';
 
 export interface ExportRequest {
   format: ExportFormat;

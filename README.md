@@ -49,7 +49,7 @@ Go through [the official docs](https://docs.docker.com/desktop/extensions-sdk/qu
 ### Prerequisites
 
 - **Docker Desktop 4.10.0+** (extensions must be enabled)
-- **Node.js 20+** (matches package.json engines)
+- **Bun 1.3.8** (matches packageManager and engines)
 - **Go 1.19+** (matches vm/go.mod)
 - **Note:** Dive CLI is bundled in the extension VM and not required locally
 
@@ -71,9 +71,14 @@ This workflow allows hot-reload of UI changes without rebuilding the extension i
 
 ### Initial setup
 
-1. Install UI dependencies: `npm --prefix ui install`
+1. Install project dependencies: `just install`
 2. Build and install the local extension: `just install-development-extension`
    - This builds the image as `deep-dive:dev` and installs it in Docker Desktop
+
+### Recommended local checks
+
+- Run the full local gate before opening a PR: `just check`
+- Auto-format JS/TS files with Biome: `just fix`
 
 ### Updating local extension
 

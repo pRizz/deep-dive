@@ -2,27 +2,43 @@ image := "deep-dive:dev"
 extension_image := "prizz/deep-dive"
 tag := "dev"
 
+install:
+  bun install --frozen-lockfile
+
 build: ui-build docker-build
 
 test: ui-test vm-test
 
+check: ui-format-check ui-lint ui-test ui-build vm-fmt-check vm-vet vm-test
+
+fix: ui-format
+
 ui-dev:
-  npm --prefix ui run dev
+  bun run --cwd ui dev
 
 ui-build:
-  npm --prefix ui run build
+  bun run --cwd ui build
 
 ui-test:
-  npm --prefix ui run test:run
+  bun run --cwd ui test:run
 
 ui-lint:
-  npm --prefix ui run lint
+  bun run --cwd ui lint
+
+ui-format:
+  bun run --cwd ui format
+
+ui-format-check:
+  bun run --cwd ui format:check
 
 vm-test:
   cd vm && go test ./...
 
 vm-vet:
   cd vm && go vet ./...
+
+vm-fmt-check:
+  cd vm && files="$(find . -name '*.go' -type f -exec gofmt -l {} +)" && test -z "$files" || (echo "Run 'gofmt -w' on the files listed below:" && echo "$files" && exit 1)
 
 docker-build:
   docker build -t {{image}} .

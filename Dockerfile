@@ -10,17 +10,14 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go build -trimpath -ldflags="-s -w" -o bin/service
 
-FROM --platform=$BUILDPLATFORM node:20.19-alpine AS client-builder
-WORKDIR /ui
-# cache packages in layer
-COPY ui/package.json /ui/package.json
-COPY ui/package-lock.json /ui/package-lock.json
-RUN --mount=type=cache,target=/usr/src/app/.npm \
-    npm set cache /usr/src/app/.npm && \
-    npm ci
-# install
-COPY ui /ui
-RUN npm run build
+FROM --platform=$BUILDPLATFORM oven/bun:1.3.8-alpine AS client-builder
+WORKDIR /workspace
+COPY package.json bun.lock ./
+COPY ui/package.json ui/package.json
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    bun install --frozen-lockfile
+COPY ui ui
+RUN bun run --cwd ui build
 
 FROM alpine
 ARG DIVE_VERSION=0.14.7
@@ -54,5 +51,5 @@ COPY docker-compose.yaml .
 COPY metadata.json .
 COPY docker.svg .
 COPY ui/public/scuba.svg scuba.svg
-COPY --from=client-builder /ui/dist ui
+COPY --from=client-builder /workspace/ui/dist ui
 CMD ["/service", "-socket", "/run/guest-services/extension-deep-dive.sock"]

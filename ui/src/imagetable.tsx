@@ -33,9 +33,7 @@ export default function ImageTable(props: TableProps) {
           {props.rows.slice(0, limit).map((row, i) => (
             <TableRow key={i} hover>
               <TableCell>{row.count}</TableCell>
-              <TableCell align="right">
-                {formatBytes(row.sizeBytes)}
-              </TableCell>
+              <TableCell align="right">{formatBytes(row.sizeBytes)}</TableCell>
               <TableCell align="right">{row.file}</TableCell>
             </TableRow>
           ))}
@@ -44,4 +42,3 @@ export default function ImageTable(props: TableProps) {
     </TableContainer>
   );
 }
-  

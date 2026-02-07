@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Button,
@@ -9,9 +9,9 @@ import {
   Stack,
   TextField,
   Typography,
-} from "@mui/material";
-import { CIRulesRequest, CIRulesResponse } from "./models";
-import { getErrorMessage } from "./utils";
+} from '@mui/material';
+import { CIRulesRequest, CIRulesResponse } from './models';
+import { getErrorMessage } from './utils';
 
 export default function CIGateDialog(props: {
   open: boolean;
@@ -20,21 +20,21 @@ export default function CIGateDialog(props: {
   onDownload: (content: string, filename: string) => void;
 }) {
   const { open, onClose, onGenerate, onDownload } = props;
-  const [lowestEfficiency, setLowestEfficiency] = useState("");
-  const [highestWastedBytes, setHighestWastedBytes] = useState("");
-  const [highestUserWastedPercent, setHighestUserWastedPercent] = useState("");
-  const [preview, setPreview] = useState("");
-  const [filename, setFilename] = useState(".dive-ci");
+  const [lowestEfficiency, setLowestEfficiency] = useState('');
+  const [highestWastedBytes, setHighestWastedBytes] = useState('');
+  const [highestUserWastedPercent, setHighestUserWastedPercent] = useState('');
+  const [preview, setPreview] = useState('');
+  const [filename, setFilename] = useState('.dive-ci');
   const [error, setError] = useState<string | undefined>(undefined);
   const [isGenerating, setGenerating] = useState(false);
 
   useEffect(() => {
     if (!open) {
-      setLowestEfficiency("");
-      setHighestWastedBytes("");
-      setHighestUserWastedPercent("");
-      setPreview("");
-      setFilename(".dive-ci");
+      setLowestEfficiency('');
+      setHighestWastedBytes('');
+      setHighestUserWastedPercent('');
+      setPreview('');
+      setFilename('.dive-ci');
       setError(undefined);
       setGenerating(false);
     }
@@ -57,12 +57,9 @@ export default function CIGateDialog(props: {
     setError(undefined);
     try {
       const payload: CIRulesRequest = {
-        lowestEfficiency: parseNumber(lowestEfficiency, "Lowest efficiency"),
+        lowestEfficiency: parseNumber(lowestEfficiency, 'Lowest efficiency'),
         highestWastedBytes: highestWastedBytes.trim() || undefined,
-        highestUserWastedPercent: parseNumber(
-          highestUserWastedPercent,
-          "Highest wasted percent"
-        ),
+        highestUserWastedPercent: parseNumber(highestUserWastedPercent, 'Highest wasted percent'),
       };
       const response = await onGenerate(payload);
       setPreview(response.content);
@@ -90,9 +87,9 @@ export default function CIGateDialog(props: {
             Set one or more thresholds to generate a `.dive-ci` file.
           </Typography>
           <Alert severity="info">
-            Save the generated `.dive-ci` at the root of your repository. Dive reads
-            it during CI runs (for example, in GitHub Actions) to fail builds when
-            the image exceeds the thresholds you set here.
+            Save the generated `.dive-ci` at the root of your repository. Dive reads it during CI
+            runs (for example, in GitHub Actions) to fail builds when the image exceeds the
+            thresholds you set here.
           </Alert>
           <TextField
             label="Lowest efficiency (0-1)"
@@ -100,7 +97,7 @@ export default function CIGateDialog(props: {
             onChange={(event) => setLowestEfficiency(event.target.value)}
             placeholder="0.95"
             type="number"
-            inputProps={{ step: "0.01", min: "0", max: "1" }}
+            inputProps={{ step: '0.01', min: '0', max: '1' }}
             fullWidth
           />
           <TextField
@@ -116,15 +113,11 @@ export default function CIGateDialog(props: {
             onChange={(event) => setHighestUserWastedPercent(event.target.value)}
             placeholder="0.2"
             type="number"
-            inputProps={{ step: "0.01", min: "0", max: "1" }}
+            inputProps={{ step: '0.01', min: '0', max: '1' }}
             fullWidth
           />
-          <Button
-            variant="outlined"
-            onClick={handleGenerate}
-            disabled={isGenerating}
-          >
-            {isGenerating ? "Generating..." : "Generate preview"}
+          <Button variant="outlined" onClick={handleGenerate} disabled={isGenerating}>
+            {isGenerating ? 'Generating...' : 'Generate preview'}
           </Button>
           {preview ? (
             <TextField
@@ -143,11 +136,7 @@ export default function CIGateDialog(props: {
         <Button onClick={onClose} disabled={isGenerating}>
           Close
         </Button>
-        <Button
-          variant="contained"
-          onClick={handleDownload}
-          disabled={!preview || isGenerating}
-        >
+        <Button variant="contained" onClick={handleDownload} disabled={!preview || isGenerating}>
           Download .dive-ci
         </Button>
       </DialogActions>

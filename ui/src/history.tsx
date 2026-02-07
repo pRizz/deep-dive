@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState } from 'react';
 import {
   Alert,
   Button,
@@ -9,9 +9,9 @@ import {
   Stack,
   TextField,
   Typography,
-} from "@mui/material";
-import { CompareSelectionState, CompareSide, HistoryMetadata } from "./models";
-import { formatBytes, formatPercent } from "./utils";
+} from '@mui/material';
+import { CompareSelectionState, CompareSide, HistoryMetadata } from './models';
+import { formatBytes, formatPercent } from './utils';
 
 export default function HistoryList(props: {
   entries: HistoryMetadata[];
@@ -39,11 +39,11 @@ export default function HistoryList(props: {
     onCompare,
     disabled,
   } = props;
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState('');
   const chipLabelSx = {
-    height: "auto",
-    "& .MuiChip-label": {
-      fontSize: "0.95rem",
+    height: 'auto',
+    '& .MuiChip-label': {
+      fontSize: '0.95rem',
       lineHeight: 1.4,
       paddingInline: 2,
       paddingBlock: 1,
@@ -55,24 +55,20 @@ export default function HistoryList(props: {
     if (!trimmed) {
       return entries;
     }
-    return entries.filter((entry) =>
-      entry.image.toLowerCase().includes(trimmed)
-    );
+    return entries.filter((entry) => entry.image.toLowerCase().includes(trimmed));
   }, [entries, filter]);
 
-  const compareReady = Boolean(
-    compareSelection?.leftId && compareSelection?.rightId
-  );
+  const compareReady = Boolean(compareSelection?.leftId && compareSelection?.rightId);
 
   const selectionHint = (() => {
     if (!compareSelection?.leftId && !compareSelection?.rightId) {
-      return "Select a baseline and a target to compare.";
+      return 'Select a baseline and a target to compare.';
     }
     if (compareSelection?.leftId && !compareSelection?.rightId) {
-      return "Select a target image to compare against the baseline.";
+      return 'Select a target image to compare against the baseline.';
     }
     if (!compareSelection?.leftId && compareSelection?.rightId) {
-      return "Select a baseline image to compare against the target.";
+      return 'Select a baseline image to compare against the target.';
     }
     return undefined;
   })();
@@ -110,9 +106,8 @@ export default function HistoryList(props: {
         />
       </Stack>
       <Alert severity="info">
-        History is stored in the extension volume under `/data/history` and is
-        retained across restarts. Delete entries here to remove them from this
-        machine.
+        History is stored in the extension volume under `/data/history` and is retained across
+        restarts. Delete entries here to remove them from this machine.
       </Alert>
       {selectionHint ? (
         <Typography variant="body2" color="text.secondary">
@@ -148,9 +143,7 @@ export default function HistoryList(props: {
                         {isBaseline ? (
                           <Chip label="Baseline" size="medium" color="primary" />
                         ) : null}
-                        {isTarget ? (
-                          <Chip label="Target" size="medium" color="secondary" />
-                        ) : null}
+                        {isTarget ? <Chip label="Target" size="medium" color="secondary" /> : null}
                       </Stack>
                     ) : null}
                     <Stack direction="row" spacing={1} flexWrap="wrap">
@@ -160,17 +153,11 @@ export default function HistoryList(props: {
                         sx={chipLabelSx}
                       />
                       <Chip
-                        label={`Wasted: ${formatBytes(
-                          entry.summary.inefficientBytes
-                        )}`}
+                        label={`Wasted: ${formatBytes(entry.summary.inefficientBytes)}`}
                         size="medium"
                         sx={chipLabelSx}
                       />
-                      <Chip
-                        label={`Efficiency: ${efficiency}`}
-                        size="medium"
-                        sx={chipLabelSx}
-                      />
+                      <Chip label={`Efficiency: ${efficiency}`} size="medium" sx={chipLabelSx} />
                       <Chip label={entry.source} size="medium" sx={chipLabelSx} />
                     </Stack>
                   </Stack>
@@ -195,27 +182,23 @@ export default function HistoryList(props: {
                   </Button>
                   <Button
                     size="medium"
-                    variant={isBaseline ? "contained" : "outlined"}
+                    variant={isBaseline ? 'contained' : 'outlined'}
                     onClick={() =>
-                      isBaseline
-                        ? onCompareClear?.("left")
-                        : onCompareSelect?.("left", entry.id)
+                      isBaseline ? onCompareClear?.('left') : onCompareSelect?.('left', entry.id)
                     }
                     disabled={disabled}
                   >
-                    {isBaseline ? "Baseline" : "Set baseline"}
+                    {isBaseline ? 'Baseline' : 'Set baseline'}
                   </Button>
                   <Button
                     size="medium"
-                    variant={isTarget ? "contained" : "outlined"}
+                    variant={isTarget ? 'contained' : 'outlined'}
                     onClick={() =>
-                      isTarget
-                        ? onCompareClear?.("right")
-                        : onCompareSelect?.("right", entry.id)
+                      isTarget ? onCompareClear?.('right') : onCompareSelect?.('right', entry.id)
                     }
                     disabled={disabled}
                   >
-                    {isTarget ? "Target" : "Set target"}
+                    {isTarget ? 'Target' : 'Set target'}
                   </Button>
                 </CardActions>
               </Card>

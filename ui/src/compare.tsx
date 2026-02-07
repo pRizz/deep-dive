@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Button,
@@ -15,15 +15,15 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from "@mui/material";
-import { CompareLayerDelta, HistoryEntry } from "./models";
+} from '@mui/material';
+import { CompareLayerDelta, HistoryEntry } from './models';
 import {
   buildCompareSummaryDelta,
   extractId,
   formatBytes,
   formatPercent,
   matchLayersForCompare,
-} from "./utils";
+} from './utils';
 
 type ExtensionClient = {
   host?: {
@@ -42,23 +42,23 @@ const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : String(error);
 
 const formatSignedBytes = (bytes: number) => {
-  const sign = bytes > 0 ? "+" : bytes < 0 ? "-" : "";
+  const sign = bytes > 0 ? '+' : bytes < 0 ? '-' : '';
   return `${sign}${formatBytes(Math.abs(bytes))}`;
 };
 
 const formatSignedPercent = (value: number) => {
-  const sign = value > 0 ? "+" : value < 0 ? "-" : "";
+  const sign = value > 0 ? '+' : value < 0 ? '-' : '';
   return `${sign}${formatPercent(Math.abs(value))}`;
 };
 
 const statusColorMap: Record<
-  CompareLayerDelta["status"],
-  "success" | "error" | "warning" | "default"
+  CompareLayerDelta['status'],
+  'success' | 'error' | 'warning' | 'default'
 > = {
-  added: "success",
-  removed: "error",
-  modified: "warning",
-  unchanged: "default",
+  added: 'success',
+  removed: 'error',
+  modified: 'warning',
+  unchanged: 'default',
 };
 
 export default function CompareView(props: {
@@ -69,9 +69,7 @@ export default function CompareView(props: {
 }) {
   const { leftId, rightId, onBack, client } = props;
   const [leftEntry, setLeftEntry] = useState<HistoryEntry | undefined>(undefined);
-  const [rightEntry, setRightEntry] = useState<HistoryEntry | undefined>(
-    undefined
-  );
+  const [rightEntry, setRightEntry] = useState<HistoryEntry | undefined>(undefined);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
   const [scoutError, setScoutError] = useState<string | undefined>(undefined);
@@ -79,7 +77,7 @@ export default function CompareView(props: {
   useEffect(() => {
     const fetchEntries = async () => {
       if (!client?.extension?.vm?.service) {
-        setError("Backend API is unavailable.");
+        setError('Backend API is unavailable.');
         return;
       }
       setLoading(true);
@@ -102,33 +100,23 @@ export default function CompareView(props: {
   }, [client, leftId, rightId]);
 
   const summaryDelta = useMemo(
-    () =>
-      buildCompareSummaryDelta(
-        leftEntry?.metadata.summary,
-        rightEntry?.metadata.summary
-      ),
-    [leftEntry, rightEntry]
+    () => buildCompareSummaryDelta(leftEntry?.metadata.summary, rightEntry?.metadata.summary),
+    [leftEntry, rightEntry],
   );
 
   const layerDeltas = useMemo(
-    () =>
-      matchLayersForCompare(
-        leftEntry?.result.layer ?? [],
-        rightEntry?.result.layer ?? []
-      ),
-    [leftEntry, rightEntry]
+    () => matchLayersForCompare(leftEntry?.result.layer ?? [], rightEntry?.result.layer ?? []),
+    [leftEntry, rightEntry],
   );
 
   const handleOpenScout = async () => {
     setScoutError(undefined);
     if (!client?.host?.openExternal) {
-      setScoutError(
-        "Docker Scout requires Docker Desktop sign-in and Scout enablement."
-      );
+      setScoutError('Docker Scout requires Docker Desktop sign-in and Scout enablement.');
       return;
     }
     try {
-      await client.host.openExternal("https://scout.docker.com/");
+      await client.host.openExternal('https://scout.docker.com/');
     } catch (openError) {
       setScoutError(getErrorMessage(openError));
     }
@@ -159,8 +147,7 @@ export default function CompareView(props: {
                   <Typography variant="overline">Baseline</Typography>
                   <Typography variant="h6">{leftEntry.metadata.image}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Completed:{" "}
-                    {new Date(leftEntry.metadata.completedAt).toLocaleString()}
+                    Completed: {new Date(leftEntry.metadata.completedAt).toLocaleString()}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Source: {leftEntry.metadata.source}
@@ -174,8 +161,7 @@ export default function CompareView(props: {
                   <Typography variant="overline">Target</Typography>
                   <Typography variant="h6">{rightEntry.metadata.image}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Completed:{" "}
-                    {new Date(rightEntry.metadata.completedAt).toLocaleString()}
+                    Completed: {new Date(rightEntry.metadata.completedAt).toLocaleString()}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Source: {rightEntry.metadata.source}
@@ -193,11 +179,9 @@ export default function CompareView(props: {
                   <Typography variant="body2" color="text.secondary">
                     Total size
                   </Typography>
-                  <Typography variant="h5">
-                    {formatBytes(summaryDelta.sizeBytes.right)}
-                  </Typography>
+                  <Typography variant="h5">{formatBytes(summaryDelta.sizeBytes.right)}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Baseline {formatBytes(summaryDelta.sizeBytes.left)} • Δ{" "}
+                    Baseline {formatBytes(summaryDelta.sizeBytes.left)} • Δ{' '}
                     {formatSignedBytes(summaryDelta.sizeBytes.delta)}
                   </Typography>
                 </CardContent>
@@ -211,7 +195,7 @@ export default function CompareView(props: {
                     {formatBytes(summaryDelta.inefficientBytes.right)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Baseline {formatBytes(summaryDelta.inefficientBytes.left)} • Δ{" "}
+                    Baseline {formatBytes(summaryDelta.inefficientBytes.left)} • Δ{' '}
                     {formatSignedBytes(summaryDelta.inefficientBytes.delta)}
                   </Typography>
                 </CardContent>
@@ -225,7 +209,7 @@ export default function CompareView(props: {
                     {formatPercent(summaryDelta.efficiencyScore.right)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Baseline {formatPercent(summaryDelta.efficiencyScore.left)} • Δ{" "}
+                    Baseline {formatPercent(summaryDelta.efficiencyScore.left)} • Δ{' '}
                     {formatSignedPercent(summaryDelta.efficiencyScore.delta)}
                   </Typography>
                 </CardContent>
@@ -255,8 +239,7 @@ export default function CompareView(props: {
                     {layerDeltas.map((delta) => {
                       const leftLayer = delta.left;
                       const rightLayer = delta.right;
-                      const layerId =
-                        leftLayer?.id ?? rightLayer?.id ?? delta.key;
+                      const layerId = leftLayer?.id ?? rightLayer?.id ?? delta.key;
                       return (
                         <TableRow key={delta.key} hover>
                           <TableCell>
@@ -268,17 +251,14 @@ export default function CompareView(props: {
                           </TableCell>
                           <TableCell>{extractId(layerId)}</TableCell>
                           <TableCell>
-                            {leftLayer ? formatBytes(leftLayer.sizeBytes) : "—"}
+                            {leftLayer ? formatBytes(leftLayer.sizeBytes) : '—'}
                           </TableCell>
                           <TableCell>
-                            {rightLayer ? formatBytes(rightLayer.sizeBytes) : "—"}
+                            {rightLayer ? formatBytes(rightLayer.sizeBytes) : '—'}
                           </TableCell>
                           <TableCell>{formatSignedBytes(delta.sizeBytesDelta)}</TableCell>
                           <TableCell>
-                            {(rightLayer?.command ?? leftLayer?.command ?? "").slice(
-                              0,
-                              120
-                            )}
+                            {(rightLayer?.command ?? leftLayer?.command ?? '').slice(0, 120)}
                           </TableCell>
                         </TableRow>
                       );
@@ -291,11 +271,7 @@ export default function CompareView(props: {
           <Stack spacing={2}>
             <Typography variant="h3">Docker Scout</Typography>
             <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-              <Button
-                variant="outlined"
-                onClick={handleOpenScout}
-                disabled={scoutUnavailable}
-              >
+              <Button variant="outlined" onClick={handleOpenScout} disabled={scoutUnavailable}>
                 Open in Scout
               </Button>
               {scoutUnavailable ? (

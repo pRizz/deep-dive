@@ -1,4 +1,4 @@
-import { DiveResponse, FileReference, NormalizedFileTree } from "./models";
+import { DiveResponse, FileReference, NormalizedFileTree } from './models';
 
 export interface FileTreeArtifacts {
   fileTreeData: NormalizedFileTree;
@@ -6,25 +6,23 @@ export interface FileTreeArtifacts {
 }
 
 export interface ComputeFileTreeRequest {
-  type: "compute";
+  type: 'compute';
   requestId: number;
   dive: DiveResponse;
 }
 
 export interface ComputeFileTreeSuccess {
-  type: "success";
+  type: 'success';
   requestId: number;
   fileTreeData: NormalizedFileTree;
   wastedFileReferences: FileReference[];
 }
 
 export interface ComputeFileTreeError {
-  type: "error";
+  type: 'error';
   requestId: number;
   message: string;
 }
 
 export type FileTreeWorkerRequest = ComputeFileTreeRequest;
-export type FileTreeWorkerResponse =
-  | ComputeFileTreeSuccess
-  | ComputeFileTreeError;
+export type FileTreeWorkerResponse = ComputeFileTreeSuccess | ComputeFileTreeError;
