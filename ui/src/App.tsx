@@ -1432,7 +1432,11 @@ export function App() {
                         Dismiss
                       </Button>
                     }
-                    sx={{ mb: 2, alignItems: 'center', '& .MuiAlert-action': { alignItems: 'center' } }}
+                    sx={{
+                      mb: 2,
+                      alignItems: 'center',
+                      '& .MuiAlert-action': { alignItems: 'center' },
+                    }}
                   >
                     <Stack spacing={0.75}>
                       <Typography variant="body2">
@@ -1450,7 +1454,8 @@ export function App() {
                         {' | '}Skipped already analyzed: {bulkReport.skippedAlreadyAnalyzedCount}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Succeeded: {bulkReport.succeeded.length} | Failed: {bulkReport.failed.length}
+                        Succeeded: {bulkReport.succeeded.length} | Failed:{' '}
+                        {bulkReport.failed.length}
                       </Typography>
                       {bulkReport.cancelled ? (
                         <Typography variant="body2" color="text.secondary">

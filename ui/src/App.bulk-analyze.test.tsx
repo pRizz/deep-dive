@@ -640,7 +640,9 @@ describe('App bulk analyze flow', () => {
 
     const dismissButton = await waitForButton('dismiss');
     await clickButton(dismissButton);
-    await waitFor(() => !pageText().includes('bulk analysis complete for images newer than 3 days'));
+    await waitFor(
+      () => !pageText().includes('bulk analysis complete for images newer than 3 days'),
+    );
 
     const viewButtonAfterDismiss = await waitForButton('view analysis');
     await clickButton(viewButtonAfterDismiss);
