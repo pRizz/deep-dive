@@ -95,7 +95,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Set up Docker Scout CLI
-        uses: docker/scout-cli-action@v1
+        uses: docker/scout-action@v1
 
       - name: Evaluate Docker Scout policy (non-blocking)
         id: scout-policy
