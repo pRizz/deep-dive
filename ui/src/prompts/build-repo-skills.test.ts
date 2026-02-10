@@ -3,6 +3,9 @@ import {
   buildGeneratedRepoSkillFiles,
   buildGeneratedRepoSkillsIndexReadmeFile,
   buildGeneratedRepoSkillsInstallScriptFile,
+  CODEX_SKILLS_CREATE_URL,
+  CODEX_SKILLS_INSTALL_URL,
+  CODEX_SKILLS_OVERVIEW_URL,
   GENERATED_REPO_SKILL_PREFIX,
   REPO_SKILLS_INDEX_README_PATH,
   REPO_SKILLS_INSTALL_SCRIPT_PATH,
@@ -96,6 +99,9 @@ describe('buildGeneratedRepoSkillsIndexReadmeFile', () => {
     expect(readmeFile.content).toContain('Generated file: run `just build-skills`');
     expect(readmeFile.content).toContain('One-command global install');
     expect(readmeFile.content).toContain(`curl -fsSL "${REPO_SKILLS_INSTALL_SCRIPT_URL}" | bash`);
+    expect(readmeFile.content).toContain(CODEX_SKILLS_OVERVIEW_URL);
+    expect(readmeFile.content).toContain(CODEX_SKILLS_CREATE_URL);
+    expect(readmeFile.content).toContain(CODEX_SKILLS_INSTALL_URL);
     expect(readmeFile.content).toContain('`~/.codex/skills/<slug>/SKILL.md`');
     expect(readmeFile.content).toContain('`<repo>/.codex/skills/<slug>/SKILL.md`');
     expect(readmeFile.content).toContain(

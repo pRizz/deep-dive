@@ -8,6 +8,9 @@ export const REPO_SKILLS_INSTALL_SCRIPT_PATH = `${REPO_SKILLS_ROOT}/install-all.
 export const REPO_SKILLS_RAW_BASE_URL =
   'https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills';
 export const REPO_SKILLS_INSTALL_SCRIPT_URL = `${REPO_SKILLS_RAW_BASE_URL}/install-all.sh`;
+export const CODEX_SKILLS_OVERVIEW_URL = 'https://developers.openai.com/codex/skills';
+export const CODEX_SKILLS_CREATE_URL = 'https://developers.openai.com/codex/skills#create-a-skill';
+export const CODEX_SKILLS_INSTALL_URL = 'https://developers.openai.com/codex/skills#install-skills';
 
 function ensureTrailingNewline(content: string): string {
   const normalized = content.replace(/\r\n/g, '\n');
@@ -55,6 +58,11 @@ function buildIndexReadmeContent(promptCards: PromptCardDefinition[]): string {
     `curl -fsSL "${REPO_SKILLS_INSTALL_SCRIPT_URL}" -o /tmp/deep-dive-skills-install-all.sh`,
     'bash /tmp/deep-dive-skills-install-all.sh',
     '```',
+    '',
+    '## Official Codex Skills docs',
+    `- Overview: \`${CODEX_SKILLS_OVERVIEW_URL}\``,
+    `- Create a skill: \`${CODEX_SKILLS_CREATE_URL}\``,
+    `- Install skills: \`${CODEX_SKILLS_INSTALL_URL}\``,
     '',
     '## Install destinations',
     '- User-global (default installer target): `~/.codex/skills/<slug>/SKILL.md`',

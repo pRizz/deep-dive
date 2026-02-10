@@ -14,6 +14,12 @@ Deep Dive now provides two reusable instruction formats from the **Prompts** tab
   - Works in any AI chat/tool that accepts markdown instructions.
   - Includes sections: Context, Objective, Inputs, Instructions, Constraints, Response format.
 
+## Official Codex Docs
+
+- Overview: https://developers.openai.com/codex/skills
+- Create a skill: https://developers.openai.com/codex/skills#create-a-skill
+- Install skills: https://developers.openai.com/codex/skills#install-skills
+
 ## Single Skill Workflow
 
 1. Open **Prompts** tab.

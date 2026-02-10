@@ -12,6 +12,11 @@ curl -fsSL "https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills
 bash /tmp/deep-dive-skills-install-all.sh
 ```
 
+## Official Codex Skills docs
+- Overview: `https://developers.openai.com/codex/skills`
+- Create a skill: `https://developers.openai.com/codex/skills#create-a-skill`
+- Install skills: `https://developers.openai.com/codex/skills#install-skills`
+
 ## Install destinations
 - User-global (default installer target): `~/.codex/skills/<slug>/SKILL.md`
 - Project-local: `<repo>/.codex/skills/<slug>/SKILL.md`
