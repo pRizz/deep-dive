@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildSkillText } from './build-skill-text';
+import { buildSkillText, toSkillSlug } from './build-skill-text';
 import { promptCards } from './load-prompt-cards';
 
 describe('buildSkillText', () => {
@@ -7,13 +7,16 @@ describe('buildSkillText', () => {
     const card = promptCards[0];
     const output = buildSkillText(card);
 
+    expect(output.codexSkillMarkdown.startsWith('---\n')).toBe(true);
+    expect(output.codexSkillMarkdown).toContain(`name: ${toSkillSlug(card)}`);
+    expect(output.codexSkillMarkdown).toContain('description:');
     expect(output.codexSkillMarkdown).toContain(`# ${card.title}`);
-    expect(output.codexSkillMarkdown).toContain('## Purpose');
-    expect(output.codexSkillMarkdown).toContain('## When to use');
-    expect(output.codexSkillMarkdown).toContain('## Required inputs');
-    expect(output.codexSkillMarkdown).toContain('## Steps');
-    expect(output.codexSkillMarkdown).toContain('## Constraints');
-    expect(output.codexSkillMarkdown).toContain('## Expected output');
+    expect(output.codexSkillMarkdown).toContain('## Use this when');
+    expect(output.codexSkillMarkdown).toContain('## How to use');
+    expect(output.codexSkillMarkdown).toContain('### Required inputs');
+    expect(output.codexSkillMarkdown).toContain('### Steps');
+    expect(output.codexSkillMarkdown).toContain('### Constraints');
+    expect(output.codexSkillMarkdown).toContain('### Expected output');
     expect(output.codexSkillMarkdown).toContain(card.useWhen);
   });
 

@@ -9,7 +9,7 @@ Deep Dive now provides two reusable instruction formats from the **Prompts** tab
 
 - **Codex (`SKILL.md`)**
   - Designed for Codex-style skill libraries.
-  - Includes sections: Purpose, When to use, Required inputs, Steps, Constraints, Expected output.
+  - Includes YAML frontmatter (`name`, `description`) plus sections: Use this when, How to use, Required inputs, Steps, Constraints, Expected output.
 - **Generic (`.md`)**
   - Works in any AI chat/tool that accepts markdown instructions.
   - Includes sections: Context, Objective, Inputs, Instructions, Constraints, Response format.
@@ -34,6 +34,20 @@ The bundle also includes:
 
 - `deep-dive-skills/README.md`
 - `deep-dive-skills/manifest.json`
+
+### After download
+
+#### Import into Codex
+
+1. Unzip the bundle.
+2. Copy folders from `deep-dive-skills/codex/<slug>/SKILL.md` into either `~/.agents/skills/<slug>/SKILL.md` (user-global, recommended) or `<repo>/.codex/skills/<slug>/SKILL.md` (project-local), preserving `<slug>/SKILL.md`.
+3. Restart Codex.
+
+#### Use in Other AI Apps/CLIs
+
+1. Use files from `deep-dive-skills/generic/*.md`.
+2. Paste into the system/developer/custom-instructions area of your target AI app or CLI.
+3. Optionally keep these files as reusable prompt library snippets.
 
 ## Request New Prompts or Skills
 

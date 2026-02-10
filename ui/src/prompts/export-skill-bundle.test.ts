@@ -4,32 +4,53 @@ import { promptCards } from './load-prompt-cards';
 
 describe('buildSkillBundleFiles', () => {
   const cards = promptCards.slice(0, 2);
+  const readmePath = 'deep-dive-skills/README.md';
+
+  function getReadmeContent(files: { path: string; content: string }[]): string {
+    return files.find((file) => file.path === readmePath)?.content ?? '';
+  }
 
   it('builds codex-only files', () => {
     const { files } = buildSkillBundleFiles(cards, 'codex');
     const paths = files.map((file) => file.path);
+    const readme = getReadmeContent(files);
 
-    expect(paths).toContain('deep-dive-skills/README.md');
+    expect(paths).toContain(readmePath);
     expect(paths).toContain('deep-dive-skills/manifest.json');
     expect(paths.some((path) => path.includes('/codex/'))).toBe(true);
     expect(paths.some((path) => path.includes('/generic/'))).toBe(false);
+    expect(readme).toContain('## Import into Codex');
+    expect(readme).toContain('~/.agents/skills');
+    expect(readme).toContain('<repo>/.codex/skills');
+    expect(readme).toContain('Restart Codex.');
+    expect(readme).not.toContain('$CODEX_HOME/skills');
+    expect(readme).not.toContain('## Use in Other AI Apps/CLIs');
   });
 
   it('builds generic-only files', () => {
     const { files } = buildSkillBundleFiles(cards, 'generic');
     const paths = files.map((file) => file.path);
+    const readme = getReadmeContent(files);
 
     expect(paths.some((path) => path.includes('/generic/'))).toBe(true);
     expect(paths.some((path) => path.includes('/codex/'))).toBe(false);
+    expect(readme).toContain('## Use in Other AI Apps/CLIs');
+    expect(readme).toContain('deep-dive-skills/generic/*.md');
+    expect(readme).toContain('system/developer/custom-instructions');
+    expect(readme).not.toContain('## Import into Codex');
   });
 
   it('builds both codex and generic files', () => {
     const { files, manifest } = buildSkillBundleFiles(cards, 'both');
     const paths = files.map((file) => file.path);
+    const readme = getReadmeContent(files);
 
     expect(paths.some((path) => path.includes('/generic/'))).toBe(true);
     expect(paths.some((path) => path.includes('/codex/'))).toBe(true);
     expect(manifest.totalSkills).toBe(cards.length);
+    expect(readme).toContain('## Import into Codex');
+    expect(readme).toContain('## Use in Other AI Apps/CLIs');
+    expect(readme).toContain('## Troubleshooting');
   });
 
   it('produces a zip with expected files', async () => {

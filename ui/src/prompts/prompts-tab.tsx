@@ -165,6 +165,9 @@ export default function PromptsTab(props: PromptsTabProps) {
               .
             </Typography>
             <Typography variant="body2">
+              Exported zip bundles include a README with Codex import and generic AI usage steps.
+            </Typography>
+            <Typography variant="body2">
               Want a new prompt or skill?{' '}
               <Link href={GITHUB_ISSUES_URL} target="_blank" rel="noopener noreferrer">
                 Request it on GitHub Issues

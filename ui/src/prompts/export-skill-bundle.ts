@@ -19,21 +19,54 @@ function selectedFormatsForBundle(bundleFormat: SkillBundleFormat): SkillFormat[
 }
 
 function buildBundleReadme(bundleFormat: SkillBundleFormat): string {
-  return [
+  const includeCodex = bundleFormat === 'codex' || bundleFormat === 'both';
+  const includeGeneric = bundleFormat === 'generic' || bundleFormat === 'both';
+
+  const lines = [
     '# Deep Dive Skills Bundle',
     '',
     `Generated from the Deep Dive Prompts tab. Export format: ${bundleFormat}.`,
     '',
     '## What is included',
     '- `manifest.json`: metadata for all generated skills',
-    '- `codex/<slug>/SKILL.md`: Codex-compatible skill files',
-    '- `generic/<slug>.md`: generic markdown skill files',
-    '',
-    '## How to use',
-    '1. Choose a file from `codex` or `generic`.',
-    '2. Paste into your AI workflow or save into your own skill library.',
-    '3. For Codex skills, keep the file name as `SKILL.md` in a folder per skill.',
-  ].join('\n');
+  ];
+
+  if (includeCodex) {
+    lines.push('- `codex/<slug>/SKILL.md`: Codex-compatible skill files');
+  }
+  if (includeGeneric) {
+    lines.push('- `generic/<slug>.md`: generic markdown skill files');
+  }
+
+  lines.push('');
+
+  if (includeCodex) {
+    lines.push(
+      '## Import into Codex',
+      '1. Unzip this bundle.',
+      '2. Copy folders from `deep-dive-skills/codex/<slug>/SKILL.md` into either `~/.agents/skills/<slug>/SKILL.md` (user-global, recommended) or `<repo>/.codex/skills/<slug>/SKILL.md` (project-local), preserving `<slug>/SKILL.md`.',
+      '3. Restart Codex.',
+      '',
+    );
+  }
+
+  if (includeGeneric) {
+    lines.push(
+      '## Use in Other AI Apps/CLIs',
+      '1. Use files from `deep-dive-skills/generic/*.md`.',
+      '2. Paste into the system/developer/custom-instructions area of your target AI app or CLI.',
+      '3. Optionally keep these files as reusable prompt library snippets.',
+      '',
+    );
+  }
+
+  lines.push(
+    '## Troubleshooting',
+    '- If a skill does not appear in Codex, confirm it is in `~/.agents/skills/<skill-slug>/SKILL.md` or `<repo>/.codex/skills/<skill-slug>/SKILL.md`, then restart Codex.',
+    '- If you exported only one format, re-export as `Both` to get both Codex and Generic files.',
+  );
+
+  return lines.join('\n');
 }
 
 function buildManifest(

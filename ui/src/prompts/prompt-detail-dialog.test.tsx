@@ -116,7 +116,11 @@ describe('PromptDetailDialog', () => {
     await waitFor(() => normalizeText(document.body).includes('copy-ready skill (codex skill.md)'));
     const codexSkillField = findInputByLabel(document.body, 'Copy-ready skill (Codex SKILL.md)');
     expect(codexSkillField).toBeDefined();
-    expect(codexSkillField?.value).toContain('## Purpose');
+    expect(codexSkillField?.value).toContain('---');
+    expect(codexSkillField?.value).toContain('name:');
+    expect(codexSkillField?.value).toContain('description:');
+    expect(codexSkillField?.value).toContain('## Use this when');
+    expect(codexSkillField?.value).toContain('## How to use');
 
     const genericRadio = findRadioByLabel(document.body, 'generic');
     expect(genericRadio).toBeDefined();

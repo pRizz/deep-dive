@@ -64,6 +64,15 @@ export default function ExportSkillsDialog(props: {
               <FormControlLabel value="generic" control={<Radio />} label="Generic" />
             </RadioGroup>
           </FormControl>
+          <Typography variant="body2" color="text.secondary">
+            Codex reads skills from `~/.agents/skills` (user-global, recommended) or
+            `&lt;repo&gt;/.codex/skills` (project-local). Keep each skill in
+            `&lt;slug&gt;/SKILL.md`.
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Generic files can be pasted into system/developer/custom-instructions in any AI app or
+            CLI.
+          </Typography>
           {error ? <Alert severity="error">{error}</Alert> : null}
         </Stack>
       </DialogContent>

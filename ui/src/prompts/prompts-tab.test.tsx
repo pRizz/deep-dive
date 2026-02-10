@@ -113,6 +113,9 @@ describe('PromptsTab', () => {
     });
 
     expect(pageText).toContain('skills are reusable instruction playbooks');
+    expect(pageText).toContain(
+      'exported zip bundles include a readme with codex import and generic ai usage steps',
+    );
     const issuesLinks = Array.from(container.querySelectorAll('a[href]')).filter(
       (link) => (link as HTMLAnchorElement).getAttribute('href') === GITHUB_ISSUES_URL,
     );
@@ -222,6 +225,10 @@ describe('PromptsTab', () => {
     await clickButton(openExportDialogButton);
 
     await waitFor(() => normalizeText(document.body).includes('choose which skill formats'));
+    const exportDialogText = normalizeText(document.body);
+    expect(exportDialogText).toContain('~/.agents/skills');
+    expect(exportDialogText).toContain('.codex/skills');
+    expect(exportDialogText).toContain('system/developer/custom-instructions');
     const exportSkillsButton = await waitForButton(document.body, 'export skills', 0);
     await clickButton(exportSkillsButton);
 

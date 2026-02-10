@@ -4,6 +4,13 @@ function toNumberedList(items: string[]): string[] {
   return items.map((item, index) => `${index + 1}. ${item}`);
 }
 
+function joinNonEmpty(parts: string[]): string {
+  return parts
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0)
+    .join(' ');
+}
+
 export function toSkillSlug(promptCard: PromptCardDefinition): string {
   const normalized = promptCard.id
     .trim()
@@ -14,25 +21,34 @@ export function toSkillSlug(promptCard: PromptCardDefinition): string {
 }
 
 export function buildCodexSkillMarkdown(promptCard: PromptCardDefinition): string {
+  const skillName = toSkillSlug(promptCard);
+  const skillDescription = promptCard.teaser.trim() || promptCard.title.trim();
+  const usageContext = joinNonEmpty([promptCard.teaser, promptCard.expectedImpact]);
+
   return [
+    '---',
+    `name: ${skillName}`,
+    `description: ${JSON.stringify(skillDescription)}`,
+    '---',
+    '',
     `# ${promptCard.title}`,
     '',
-    '## Purpose',
-    `${promptCard.teaser} ${promptCard.expectedImpact}`,
-    '',
-    '## When to use',
+    '## Use this when',
     promptCard.useWhen,
     '',
-    '## Required inputs',
+    '## How to use',
+    usageContext,
+    '',
+    '### Required inputs',
     ...toNumberedList(promptCard.prompt.requiredInputs),
     '',
-    '## Steps',
+    '### Steps',
     ...toNumberedList(promptCard.prompt.tasks),
     '',
-    '## Constraints',
+    '### Constraints',
     ...toNumberedList(promptCard.prompt.constraints),
     '',
-    '## Expected output',
+    '### Expected output',
     ...toNumberedList(promptCard.prompt.outputFormat),
   ].join('\n');
 }
