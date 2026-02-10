@@ -15,7 +15,7 @@ Quick Install: Docker Extension
 docker extension install prizz/deep-dive:latest
 ```
 
-Quick Install: Codex Skills (Global)
+Quick Install: Codex Skills for Dockerfile Enhancements/Fixes (Global)
 ```bash
 curl -fsSL "https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/install-all.sh" | bash
 ```
