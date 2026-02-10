@@ -10,9 +10,14 @@
 
 A Docker extension that helps you explore a docker image, layer contents, and discover ways to shrink the size of your Docker/OCI image.
 
-Quick install:
-```
+Quick Install: Docker Extension
+```bash
 docker extension install prizz/deep-dive:latest
+```
+
+Quick Install: Codex Skills (Global)
+```bash
+curl -fsSL "https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/install-all.sh" | bash
 ```
 
 Built on top of the Dive CLI: [pRizz/dive](https://github.com/pRizz/dive), a fork of the excellent [wagoodman/dive](https://github.com/wagoodman/dive) CLI tool.
@@ -31,7 +36,6 @@ https://github.com/prakhar1989/dive-in
 Prompts and skills usage guide (including Codex install paths such as `~/.codex/skills` and project-local `.codex/skills`): `docs/prompts-and-skills.md`
 Repo-local generated Codex skills are written to `.codex/skills` via `just build-skills` (also run by `just build`, `just check`, and `just dev`).
 Direct raw-link install guidance and the generated skills index live at `.codex/skills/README.md`.
-One-command global installer (GitHub raw): `curl -fsSL "https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/install-all.sh" | bash`
 Official Codex skills docs: [overview](https://developers.openai.com/codex/skills), [create](https://developers.openai.com/codex/skills#create-a-skill), [install](https://developers.openai.com/codex/skills#install-skills)
 
 ![List of images](screenshots/1.png)
