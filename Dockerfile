@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/root/.bun/install/cache \
 COPY ui ui
 RUN bun run --cwd ui build
 
-FROM alpine
+FROM alpine:3.23 AS dive-downloader
 # Always resolve the latest stable pRizz/dive release at build time so this
 # extension tracks our fork automatically, including future major versions.
 # A primary reason for maintaining the fork is to address Docker Scout
@@ -42,8 +42,15 @@ RUN apk add --no-cache ca-certificates curl tar \
     && if [ -z "${DIVE_TARBALL_URL}" ]; then echo "Failed to resolve pRizz/dive Linux tarball for arch ${DIVE_ARCH}." >&2; exit 1; fi \
     && echo "Resolved pRizz/dive release: ${DIVE_TAG}" \
     && echo "Resolved pRizz/dive asset: ${DIVE_TARBALL_URL}" \
-    && curl -fsSL "${DIVE_TARBALL_URL}" | tar -xz -C /usr/local/bin dive \
-    && chmod +x /usr/local/bin/dive
+    && curl -fsSL "${DIVE_TARBALL_URL}" | tar -xz -C /tmp dive \
+    && install -m 0755 /tmp/dive /usr/local/bin/dive
+
+FROM alpine:3.23
+RUN apk add --no-cache ca-certificates su-exec \
+    && addgroup -S -g 10001 deepdive \
+    && adduser -S -D -u 10001 -G deepdive -h /home/deepdive deepdive \
+    && install -d -o deepdive -g deepdive -m 0755 /data/history /run/guest-services /home/deepdive
+ENV HOME=/home/deepdive
 LABEL org.opencontainers.image.title="Deep Dive" \
     org.opencontainers.image.description="Explore docker images, layer contents, and discover ways to shrink the size of your Docker/OCI image." \
     org.opencontainers.image.vendor="Peter Ryszkiewicz" \
@@ -56,10 +63,14 @@ LABEL org.opencontainers.image.title="Deep Dive" \
     com.docker.extension.additional-urls='[{"title":"Documentation","url":"https://github.com/pRizz/deep-dive"},{"title":"Issues","url":"https://github.com/pRizz/deep-dive/issues"}]' \
     com.docker.extension.changelog="Various fixes and improvements. See <a href=\"https://github.com/pRizz/deep-dive/releases\">https://github.com/pRizz/deep-dive/releases</a> for details."
 
-COPY --from=builder /backend/bin/service /
+COPY --from=dive-downloader /usr/local/bin/dive /usr/local/bin/dive
+COPY --from=builder /backend/bin/service /service
 COPY docker-compose.yaml .
 COPY metadata.json .
 COPY docker.svg .
 COPY ui/public/scuba.svg scuba.svg
 COPY --from=client-builder /workspace/ui/dist ui
-CMD ["/service", "-socket", "/run/guest-services/extension-deep-dive.sock"]
+COPY --chmod=0755 scripts/runtime-entrypoint.sh /usr/local/bin/runtime-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/runtime-entrypoint.sh"]
+CMD ["-socket", "/run/guest-services/extension-deep-dive.sock"]
