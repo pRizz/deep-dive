@@ -45,7 +45,7 @@
 
 - `just build-skills` generates repo-local Codex skills under `.codex/skills/deep-dive-*/SKILL.md`.
 - `just build`, `just check`, and `just dev` can update generated skill files as part of normal workflow.
-- `.codex/skills/README.md` is generated/tracked and should be committed with skill updates because raw-link references depend on it.
+- `.codex/skills/README.md` and `.codex/skills/install-all.sh` are generated/tracked and should be committed with skill updates.
 - When prompt data or skill-generation logic changes, generated skill file diffs are expected and should be committed.
 
 ## Git push default

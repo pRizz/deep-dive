@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import {
   buildGeneratedRepoSkillFiles,
   buildGeneratedRepoSkillsIndexReadmeFile,
+  buildGeneratedRepoSkillsInstallScriptFile,
   GENERATED_REPO_SKILL_PREFIX,
   REPO_SKILLS_ROOT,
   toGeneratedRepoSkillDirectoryName,
@@ -88,7 +89,12 @@ async function main() {
   const promptCards = loadPromptCardsFromEntries(promptEntries);
   const generatedSkillFiles = buildGeneratedRepoSkillFiles(promptCards);
   const generatedIndexReadmeFile = buildGeneratedRepoSkillsIndexReadmeFile(promptCards);
-  const generatedFiles = [...generatedSkillFiles, generatedIndexReadmeFile];
+  const generatedInstallScriptFile = buildGeneratedRepoSkillsInstallScriptFile(promptCards);
+  const generatedFiles = [
+    ...generatedSkillFiles,
+    generatedIndexReadmeFile,
+    generatedInstallScriptFile,
+  ];
 
   await mkdir(REPO_SKILLS_DIR, { recursive: true });
 
@@ -100,7 +106,7 @@ async function main() {
   await writeGeneratedSkillFiles(generatedFiles);
 
   console.log(
-    `Generated ${generatedSkillFiles.length} Codex skill files and README index in ${toForwardSlashPath(
+    `Generated ${generatedSkillFiles.length} Codex skill files plus installer artifacts in ${toForwardSlashPath(
       REPO_SKILLS_ROOT,
     )}.`,
   );

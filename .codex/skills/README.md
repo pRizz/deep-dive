@@ -2,17 +2,28 @@
 
 > Generated file: run `just build-skills` to refresh. Commit changes in this directory when skill sources or generation logic change.
 
+## One-command global install
+```bash
+curl -fsSL "https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/install-all.sh" | bash
+```
+Review before running if desired:
+```bash
+curl -fsSL "https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/install-all.sh" -o /tmp/deep-dive-skills-install-all.sh
+bash /tmp/deep-dive-skills-install-all.sh
+```
+
 ## Install destinations
-- User-global (recommended): `~/.agents/skills/<slug>/SKILL.md`
+- User-global (default installer target): `~/.codex/skills/<slug>/SKILL.md`
 - Project-local: `<repo>/.codex/skills/<slug>/SKILL.md`
+- Override installer target with `DEEP_DIVE_SKILLS_INSTALL_ROOT=/custom/path`
 
 ## Raw URL template
 - `https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/<slug>/SKILL.md`
 
-## Example install command (user-global)
+## Example manual install command (user-global)
 ```bash
-mkdir -p ~/.agents/skills/deep-dive-optimize-layer-caching
-curl -fsSL "https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/deep-dive-optimize-layer-caching/SKILL.md" -o ~/.agents/skills/deep-dive-optimize-layer-caching/SKILL.md
+mkdir -p ~/.codex/skills/deep-dive-optimize-layer-caching
+curl -fsSL "https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/deep-dive-optimize-layer-caching/SKILL.md" -o ~/.codex/skills/deep-dive-optimize-layer-caching/SKILL.md
 ```
 
 ## Available skills

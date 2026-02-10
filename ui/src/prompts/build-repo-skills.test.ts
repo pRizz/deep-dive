@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   buildGeneratedRepoSkillFiles,
   buildGeneratedRepoSkillsIndexReadmeFile,
+  buildGeneratedRepoSkillsInstallScriptFile,
   GENERATED_REPO_SKILL_PREFIX,
   REPO_SKILLS_INDEX_README_PATH,
+  REPO_SKILLS_INSTALL_SCRIPT_PATH,
+  REPO_SKILLS_INSTALL_SCRIPT_URL,
   REPO_SKILLS_RAW_BASE_URL,
   REPO_SKILLS_ROOT,
   toGeneratedRepoSkillDirectoryName,
@@ -91,7 +94,9 @@ describe('buildGeneratedRepoSkillsIndexReadmeFile', () => {
 
     expect(readmeFile.path).toBe(REPO_SKILLS_INDEX_README_PATH);
     expect(readmeFile.content).toContain('Generated file: run `just build-skills`');
-    expect(readmeFile.content).toContain('`~/.agents/skills/<slug>/SKILL.md`');
+    expect(readmeFile.content).toContain('One-command global install');
+    expect(readmeFile.content).toContain(`curl -fsSL "${REPO_SKILLS_INSTALL_SCRIPT_URL}" | bash`);
+    expect(readmeFile.content).toContain('`~/.codex/skills/<slug>/SKILL.md`');
     expect(readmeFile.content).toContain('`<repo>/.codex/skills/<slug>/SKILL.md`');
     expect(readmeFile.content).toContain(
       `${REPO_SKILLS_RAW_BASE_URL}/deep-dive-alpha-skill/SKILL.md`,
@@ -101,6 +106,34 @@ describe('buildGeneratedRepoSkillsIndexReadmeFile', () => {
     expect(readmeFile.content.endsWith('\n')).toBe(true);
     expect(readmeFile.content.indexOf('deep-dive-alpha-skill')).toBeLessThan(
       readmeFile.content.indexOf('deep-dive-zeta-skill'),
+    );
+  });
+});
+
+describe('buildGeneratedRepoSkillsInstallScriptFile', () => {
+  it('builds installer script with strict mode, global default, and deterministic skill list', () => {
+    const installScriptFile = buildGeneratedRepoSkillsInstallScriptFile([
+      createPromptCard({ id: 'zeta-skill', order: 2, title: 'Zeta Skill' }),
+      createPromptCard({ id: 'alpha-skill', order: 1, title: 'Alpha Skill' }),
+    ]);
+
+    expect(installScriptFile.path).toBe(REPO_SKILLS_INSTALL_SCRIPT_PATH);
+    expect(installScriptFile.content.startsWith('#!/usr/bin/env bash\nset -Eeuo pipefail')).toBe(
+      true,
+    );
+    expect(installScriptFile.content).toContain('DEFAULT_INSTALL_ROOT="${HOME}/.codex/skills"');
+    expect(installScriptFile.content).toContain(REPO_SKILLS_INSTALL_SCRIPT_URL);
+    expect(installScriptFile.content).toContain(
+      `${REPO_SKILLS_RAW_BASE_URL}/deep-dive-alpha-skill/SKILL.md`,
+    );
+    expect(installScriptFile.content).toContain(
+      `${REPO_SKILLS_RAW_BASE_URL}/deep-dive-zeta-skill/SKILL.md`,
+    );
+    expect(installScriptFile.content).toContain('Install summary: installed=');
+    expect(installScriptFile.content).toContain('Restart Codex to pick up new skills.');
+    expect(installScriptFile.content.endsWith('\n')).toBe(true);
+    expect(installScriptFile.content.indexOf('deep-dive-alpha-skill')).toBeLessThan(
+      installScriptFile.content.indexOf('deep-dive-zeta-skill'),
     );
   });
 });

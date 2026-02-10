@@ -47,6 +47,18 @@ Deep Dive also generates repo-tracked Codex skills from prompt card JSON data:
 
 When prompt data or skill generator logic changes, updates to generated `.codex/skills` files are expected and should be committed.
 
+### Global install script (generated)
+
+The generated skills index includes a one-command installer script:
+
+```bash
+curl -fsSL "https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/install-all.sh" | bash
+```
+
+- Default global install destination: `~/.codex/skills`
+- Override destination if needed: `DEEP_DIVE_SKILLS_INSTALL_ROOT=/custom/path ...`
+- The script is idempotent and prints per-skill status plus a final summary.
+
 ### After download
 
 #### Import into Codex
