@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
+  Box,
   Button,
   Card,
   CardActionArea,
@@ -21,6 +22,7 @@ import ExportSkillsDialog from './export-skills-dialog';
 import { createSkillBundleZip } from './export-skill-bundle';
 import { promptCards } from './load-prompt-cards';
 import PromptDetailDialog from './prompt-detail-dialog';
+import { INSTALL_ALL_SKILLS_COMMAND } from './skills-install-command';
 import { PromptCardCategory, PromptCardDefinition, SkillBundleFormat } from './types';
 
 const COPY_FEEDBACK_MS = 1800;
@@ -60,6 +62,7 @@ export default function PromptsTab(props: PromptsTabProps) {
   const [copyError, setCopyError] = useState<string | undefined>(undefined);
   const [copiedPromptByCardId, setCopiedPromptByCardId] = useState<Record<string, boolean>>({});
   const [copiedSkillByCardId, setCopiedSkillByCardId] = useState<Record<string, boolean>>({});
+  const [isInstallCommandCopied, setInstallCommandCopied] = useState(false);
   const [isExportDialogOpen, setExportDialogOpen] = useState(false);
   const dockerDesktopLinkTip = useMemo(
     () => resolveDockerDesktopLinkTip(hostPlatform),
@@ -67,6 +70,7 @@ export default function PromptsTab(props: PromptsTabProps) {
   );
   const promptCopyResetTimersRef = useRef<Map<string, number>>(new Map());
   const skillCopyResetTimersRef = useRef<Map<string, number>>(new Map());
+  const installCommandCopyResetTimerRef = useRef<number | undefined>(undefined);
 
   const selectedCard = useMemo(
     () => promptCards.find((card) => card.id === selectedCardId),
@@ -83,6 +87,10 @@ export default function PromptsTab(props: PromptsTabProps) {
         window.clearTimeout(timeoutId);
       });
       skillCopyResetTimersRef.current.clear();
+      if (installCommandCopyResetTimerRef.current !== undefined) {
+        window.clearTimeout(installCommandCopyResetTimerRef.current);
+        installCommandCopyResetTimerRef.current = undefined;
+      }
     };
   }, []);
 
@@ -148,6 +156,23 @@ export default function PromptsTab(props: PromptsTabProps) {
     downloadBlobFile(blob, filename);
   };
 
+  const handleCopyInstallCommand = async () => {
+    setCopyError(undefined);
+    try {
+      await copyToClipboard(INSTALL_ALL_SKILLS_COMMAND);
+      setInstallCommandCopied(true);
+      if (installCommandCopyResetTimerRef.current !== undefined) {
+        window.clearTimeout(installCommandCopyResetTimerRef.current);
+      }
+      installCommandCopyResetTimerRef.current = window.setTimeout(() => {
+        setInstallCommandCopied(false);
+        installCommandCopyResetTimerRef.current = undefined;
+      }, COPY_FEEDBACK_MS);
+    } catch (error) {
+      setCopyError(error instanceof Error ? error.message : String(error));
+    }
+  };
+
   return (
     <>
       <Stack spacing={2}>
@@ -164,17 +189,37 @@ export default function PromptsTab(props: PromptsTabProps) {
               </Link>
               .
             </Typography>
-            <Typography variant="body2">
-              Exported zip bundles include a README with Codex import and generic AI usage steps.
-            </Typography>
-            <Typography variant="body2">
-              Want a new prompt or skill?{' '}
-              <Link href={GITHUB_ISSUES_URL} target="_blank" rel="noopener noreferrer">
-                Request it on GitHub Issues
-              </Link>
-              .
-            </Typography>
-            <Typography variant="body2">{dockerDesktopLinkTip}</Typography>
+            <Typography variant="body2">Install all available Codex skills globally:</Typography>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={1}
+              alignItems={{ xs: 'stretch', sm: 'center' }}
+            >
+              <Box
+                component="code"
+                sx={{
+                  display: 'block',
+                  width: 'fit-content',
+                  maxWidth: '100%',
+                  fontFamily: 'monospace',
+                  bgcolor: 'action.hover',
+                  borderRadius: 1,
+                  px: 1,
+                  py: 0.75,
+                  overflowWrap: 'anywhere',
+                }}
+              >
+                {INSTALL_ALL_SKILLS_COMMAND}
+              </Box>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => void handleCopyInstallCommand()}
+                sx={{ flexShrink: 0, alignSelf: { xs: 'flex-start', sm: 'center' } }}
+              >
+                {isInstallCommandCopied ? 'Copied install command' : 'Copy install command'}
+              </Button>
+            </Stack>
           </Stack>
         </Alert>
         <Stack
@@ -259,6 +304,18 @@ export default function PromptsTab(props: PromptsTabProps) {
             </Grid>
           ))}
         </Grid>
+        <Alert severity="info" sx={{ '& .MuiAlert-message': { width: '100%' } }}>
+          <Stack spacing={0.5}>
+            <Typography variant="body2">
+              Want a new prompt or skill?{' '}
+              <Link href={GITHUB_ISSUES_URL} target="_blank" rel="noopener noreferrer">
+                Request it on GitHub Issues
+              </Link>
+              .
+            </Typography>
+            <Typography variant="body2">{dockerDesktopLinkTip}</Typography>
+          </Stack>
+        </Alert>
       </Stack>
       <PromptDetailDialog
         open={Boolean(selectedCard)}

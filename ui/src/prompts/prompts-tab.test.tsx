@@ -6,6 +6,7 @@ import { buildPromptText } from './build-prompt-text';
 import { buildSkillText } from './build-skill-text';
 import { promptCards } from './load-prompt-cards';
 import PromptsTab from './prompts-tab';
+import { INSTALL_ALL_SKILLS_COMMAND } from './skills-install-command';
 
 const { createSkillBundleZipMock, downloadBlobFileMock } = vi.hoisted(() => ({
   createSkillBundleZipMock: vi.fn(),
@@ -113,13 +114,12 @@ describe('PromptsTab', () => {
     });
 
     expect(pageText).toContain('skills are reusable instruction playbooks');
-    expect(pageText).toContain(
-      'exported zip bundles include a readme with codex import and generic ai usage steps',
-    );
+    expect(pageText).toContain(INSTALL_ALL_SKILLS_COMMAND.toLowerCase());
     const issuesLinks = Array.from(container.querySelectorAll('a[href]')).filter(
       (link) => (link as HTMLAnchorElement).getAttribute('href') === GITHUB_ISSUES_URL,
     );
     expect(issuesLinks.length).toBeGreaterThan(0);
+    expect(findButtons(container, 'copy install command').length).toBe(1);
     expect(findButtons(container, 'copy prompt').length).toBe(promptCards.length);
     expect(findButtons(container, 'copy skill').length).toBe(promptCards.length);
   });
@@ -198,6 +198,18 @@ describe('PromptsTab', () => {
     expect(writeTextMock).toHaveBeenCalledWith(buildSkillText(promptCards[0]).codexSkillMarkdown);
   });
 
+  it('copies install command from onboarding copy button', async () => {
+    await act(async () => {
+      root.render(<PromptsTab />);
+    });
+
+    const copyInstallCommandButton = await waitForButton(container, 'copy install command', 0);
+    await clickButton(copyInstallCommandButton);
+
+    await waitFor(() => writeTextMock.mock.calls.length > 0);
+    expect(writeTextMock).toHaveBeenCalledWith(INSTALL_ALL_SKILLS_COMMAND);
+  });
+
   it('copies prompt text from modal copy prompt button', async () => {
     await act(async () => {
       root.render(<PromptsTab />);
@@ -263,5 +275,34 @@ describe('PromptsTab', () => {
       await Promise.resolve();
     });
     expect(findButtons(container, 'copied prompt').length).toBe(0);
+  });
+
+  it('shows copied install command feedback then resets', async () => {
+    await act(async () => {
+      root.render(<PromptsTab />);
+    });
+
+    vi.useFakeTimers();
+
+    const copyInstallCommandButton = await waitForButton(container, 'copy install command', 0);
+    await clickButton(copyInstallCommandButton);
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(findButtons(container, 'copied install command').length).toBe(1);
+
+    await act(async () => {
+      vi.advanceTimersByTime(1799);
+      await Promise.resolve();
+    });
+    expect(findButtons(container, 'copied install command').length).toBe(1);
+
+    await act(async () => {
+      vi.advanceTimersByTime(1);
+      await Promise.resolve();
+    });
+    expect(findButtons(container, 'copied install command').length).toBe(0);
+    expect(findButtons(container, 'copy install command').length).toBe(1);
   });
 });
