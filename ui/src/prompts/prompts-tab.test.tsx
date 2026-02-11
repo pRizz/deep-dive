@@ -107,7 +107,7 @@ describe('PromptsTab', () => {
       root.render(<PromptsTab />);
     });
 
-    await waitFor(() => normalizeText(container).includes('dockerfile ai prompts'));
+    await waitFor(() => normalizeText(container).includes('container build & publish ai prompts'));
     const pageText = normalizeText(container);
     promptCards.forEach((card) => {
       expect(pageText).toContain(card.title.toLowerCase());

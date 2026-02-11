@@ -139,7 +139,7 @@ describe('App prompts tab', () => {
     await waitFor(() => tabPanels[2]?.hidden === false);
     expect(tabPanels[0]?.hidden).toBe(true);
     expect(tabPanels[1]?.hidden).toBe(true);
-    expect(normalizeText(container)).toContain('dockerfile ai prompts');
+    expect(normalizeText(container)).toContain('container build & publish ai prompts');
     expect(normalizeText(container)).toContain(
       'prompts & skills docs (⌘ command-click to open links).',
     );

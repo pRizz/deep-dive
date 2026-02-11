@@ -242,7 +242,7 @@ export default function PromptsTab(props: PromptsTabProps) {
           justifyContent="space-between"
         >
           <Stack spacing={0.5}>
-            <Typography variant="h3">Dockerfile AI Prompts</Typography>
+            <Typography variant="h3">Container Build & Publish AI Prompts</Typography>
             <Typography variant="body2" color="text.secondary">
               Copy a prompt or open a card for full details. Have an idea?{' '}
               <Link href={GITHUB_ISSUES_URL} target="_blank" rel="noopener noreferrer">

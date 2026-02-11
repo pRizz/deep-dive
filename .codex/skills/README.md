@@ -48,3 +48,4 @@ curl -fsSL "https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills
 | `deep-dive-speed-up-deps` | `.codex/skills/deep-dive-speed-up-deps/SKILL.md` | `https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/deep-dive-speed-up-deps/SKILL.md` |
 | `deep-dive-harden-runtime-image` | `.codex/skills/deep-dive-harden-runtime-image/SKILL.md` | `https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/deep-dive-harden-runtime-image/SKILL.md` |
 | `deep-dive-security-and-size-balance` | `.codex/skills/deep-dive-security-and-size-balance/SKILL.md` | `https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/deep-dive-security-and-size-balance/SKILL.md` |
+| `deep-dive-native-multi-arch-publish` | `.codex/skills/deep-dive-native-multi-arch-publish/SKILL.md` | `https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/deep-dive-native-multi-arch-publish/SKILL.md` |

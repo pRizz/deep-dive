@@ -40,6 +40,7 @@ SKILLS=(
   "deep-dive-speed-up-deps|https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/deep-dive-speed-up-deps/SKILL.md"
   "deep-dive-harden-runtime-image|https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/deep-dive-harden-runtime-image/SKILL.md"
   "deep-dive-security-and-size-balance|https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/deep-dive-security-and-size-balance/SKILL.md"
+  "deep-dive-native-multi-arch-publish|https://raw.githubusercontent.com/pRizz/deep-dive/main/.codex/skills/deep-dive-native-multi-arch-publish/SKILL.md"
 )
 
 installed_count=0
