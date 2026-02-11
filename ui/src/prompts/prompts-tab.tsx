@@ -46,14 +46,18 @@ function categoryLabel(category: PromptCardCategory): string {
   return category.charAt(0).toUpperCase() + category.slice(1);
 }
 
-function resolveDockerDesktopLinkTip(hostPlatform?: string): string {
+function resolveLinkOpenShortcutLabel(hostPlatform?: string): string {
   if (hostPlatform === 'darwin') {
-    return 'Tip (Docker Desktop): use ⌘ Command-click to open links in your browser.';
+    return '⌘ Command-click';
   }
   if (hostPlatform === 'win32' || hostPlatform === 'linux') {
-    return 'Tip (Docker Desktop): use ⌃ Control-click to open links in your browser.';
+    return '⌃ Control-click';
   }
-  return 'Tip (Docker Desktop): use ⌘/⌃ Command/Control-click to open links in your browser.';
+  return '⌘/⌃ Command/Control-click';
+}
+
+function resolveDockerDesktopLinkTip(hostPlatform?: string): string {
+  return `Tip (Docker Desktop): use ${resolveLinkOpenShortcutLabel(hostPlatform)} to open links in your browser.`;
 }
 
 export default function PromptsTab(props: PromptsTabProps) {
@@ -64,6 +68,10 @@ export default function PromptsTab(props: PromptsTabProps) {
   const [copiedSkillByCardId, setCopiedSkillByCardId] = useState<Record<string, boolean>>({});
   const [isInstallCommandCopied, setInstallCommandCopied] = useState(false);
   const [isExportDialogOpen, setExportDialogOpen] = useState(false);
+  const linkOpenShortcutLabel = useMemo(
+    () => resolveLinkOpenShortcutLabel(hostPlatform),
+    [hostPlatform],
+  );
   const dockerDesktopLinkTip = useMemo(
     () => resolveDockerDesktopLinkTip(hostPlatform),
     [hostPlatform],
@@ -186,8 +194,8 @@ export default function PromptsTab(props: PromptsTabProps) {
               Learn how to use/import skills in{' '}
               <Link href={PROMPTS_AND_SKILLS_DOCS_URL} target="_blank" rel="noopener noreferrer">
                 prompts & skills docs
-              </Link>
-              .
+              </Link>{' '}
+              ({linkOpenShortcutLabel} to open links).
             </Typography>
             <Typography variant="body2">Install all available Codex skills globally:</Typography>
             <Stack

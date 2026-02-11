@@ -141,6 +141,9 @@ describe('App prompts tab', () => {
     expect(tabPanels[1]?.hidden).toBe(true);
     expect(normalizeText(container)).toContain('dockerfile ai prompts');
     expect(normalizeText(container)).toContain(
+      'prompts & skills docs (⌘ command-click to open links).',
+    );
+    expect(normalizeText(container)).toContain(
       'tip (docker desktop): use ⌘ command-click to open links in your browser.',
     );
   });
