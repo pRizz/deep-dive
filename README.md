@@ -63,7 +63,7 @@ Go through [the official docs](https://docs.docker.com/desktop/extensions-sdk/qu
 
 - **Docker Desktop 4.10.0+** (extensions must be enabled)
 - **Bun 1.3.8** (matches packageManager and engines)
-- **Go 1.19+** (matches vm/go.mod)
+- **Go 1.26+** (matches vm/go.mod)
 - **Note:** Dive CLI is bundled in the extension VM and not required locally
 
 ### Fast dev loop (primary workflow)
